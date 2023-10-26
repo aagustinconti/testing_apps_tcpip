@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "testing-apps-tcpip-venv"
+version = "0.1.0"
+description = ""
+authors = ["aagustinconti <aagustinconti@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mkdocs = "1.5.2"
+ansible = "^8.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
