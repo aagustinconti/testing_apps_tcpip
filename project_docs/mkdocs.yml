@@ -1,0 +1,7 @@
+site_name: Testing - TPC/IP Apps
+nav:
+  - Home: 'index.md'
+  - About: 'about.md'
+
+theme:
+  name: readthedocs
