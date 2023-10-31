@@ -1,7 +1,87 @@
-site_name: Testing - TPC/IP Apps
-nav:
-  - Home: 'index.md'
-  - About: 'about.md'
+# Metadata
+site_name: Aplicaciones TCP/IP | Testing
+site_description: Proyecto final de la materia 'Aplicaciones TCP/IP' de la carrera de Ingeniería de Telecomunicaciones.
+site_author: Aguilera Conti Agustín y Príncipe Agustín
 
+# Github
+repo_url: https://github.com/aagustinconti/testing_apps_tcpip
+repo_name: aagustinconti/testing_apps_tcpip
+
+# Design
 theme:
-  name: readthedocs
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  
+  favicon: img/tech_ethernet_icon_156953.ico
+  logo: img/tech_ethernet_icon_156953.ico
+  
+  icon:
+    repo: fontawesome/brands/github
+  
+  language: es
+  
+
+  palette: 
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: blue grey
+      accent: lime
+      
+        
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      primary: blue grey
+      accent: purple
+        
+        
+
+# Links footer
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/aagustinconti/testing_apps_tcpip
+      name: Repo URL
+
+
+  # More metadata
+  meta:
+  author: Aguilera Conti Agustín y Príncipe Agustín
+  description: Proyecto final de la materia 'Aplicaciones TCP/IP' de la carrera de Ingeniería de Telecomunicaciones.
+  keywords: Testing, TCP/IP, DevOps, Telecommunications, UNRC, Ingeniería
+
+# Extensions
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+  - attr_list
+
+# Copyright footer
+copyright: |
+  &copy; 2023 <a href="https://www.ing.unrc.edu.ar/inicio.php"  target="_blank" rel="noopener">Universidad Nacional de Río cuarto | Facultad de Ingeniería</a>
