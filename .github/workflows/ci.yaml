@@ -19,4 +19,4 @@ jobs:
           path: .cache
       - run: pip install mkdocs-material
       - run: pip install pillow cairosvg
-      - run: mkdocs gh-deploy --force --config-file ./project_docs/mkdocs.yml
+      - run: mkdocs gh-deploy --force --clean
