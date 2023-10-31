@@ -10,17 +10,11 @@
   <h3 align="center">Testing - Apps TCP/IP</h3>
 
   <p align="center">
-    This is the repository containing the final project of the subject "TCP/IP Applications" of the Telecommunications Engineering course.
+    Este es el repositorio que contiene el proyecto final de la materia 'Aplicaciones TCP/IP' de la carrera de Ingeniería de Telecomunicaciones.
     <br />
     <a href="https://github.com/aagustinconti/testing_apps_tcpip"><strong>Explorar el contenido »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
-    ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a>
-  </p>
+
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -45,18 +39,16 @@
     <li><a href="#contribuir">Contribuir</a></li>
     <li><a href="#licencia">Licencia</a></li>
     <li><a href="#contacto">Contacto</a></li>
-    <li><a href="#reconocimientos">Reconocimientos</a></li>
+    <li><a href="#referencias">Referencias</a></li>
   </ol>
 </details>
 
 <!-- ABOUT THE PROJECT -->
 ## Sobre el proyecto
 
-<!--
-[![Image][image-description](image-link)
--->
+Este proyecto se centra en el desarrollo de una aplicación (API) que permite realizar operaciones CRUD en una base de datos MongoDB. El objetivo principal es utilizar los endpoints de la API para realizar pruebas de rendimiento.
 
-Comentar de que se trata el proyecto.
+Además, exploraremos y evaluaremos diversas herramientas para realizar pruebas, como Locust y k6, y la implementación de Grafana para la visualización de los resultados obtenidos.
 
 [Back to Top](#top)
 
@@ -64,13 +56,9 @@ Comentar de que se trata el proyecto.
 
 Se listan a continuación las tecnologías utilizadas.
 
-* [![Terraform][Terraform]][Terraform-url]
-* [![Ansible][Ansible]][Ansible-url]
-* [![Kubernetes][Kubernetes]][Kubernetes-url]
-* [![Docker][Docker]][Docker-url]
 * [![Python][Python]][Python-url]
-* [![Tensorflow][Tensorflow]][Tensorflow-url]
-* [![Pytorch][Pytorch]][Pytorch-url]
+* [![Grafana]][Grafana-url]
+* [![K6]][K6-url]
 
 [Back to Top](#top)
 
@@ -129,19 +117,134 @@ Mire el [proyecto](https://github.com/users/aagustinconti/projects/1) para el li
 <!-- CONTRIBUTING -->
 ## Contribuir
 
-Las contribuciones son lo que hace que la comunidad de código abierto sea un lugar increíble para aprender, inspirar y crear. Cualquier contribución que hagas será **muy apreciada**.
+### Flujo de trabajo
 
-Si tiene alguna sugerencia que pueda mejorar esto, por favor haga un fork del repositorio y cree un pull request. También puedes abrir una incidencia con la etiqueta "enhancement".
+El proceso que seguiremos implica utilizar la rama `main` como la rama de **producción** del proyecto. Cualquier nueva funcionalidad o corrección de errores se realizará creando nuevas ramas.
 
-No olvides dar una estrella al proyecto. Gracias de nuevo.
+Para incorporar una función en la rama `main`, simplemente se crea un "PR" (Pull Request), que deberá ser aprobado por algún colaborador, cualquier colaborador puede hacerlo, o bien, si no requiere revisión, puede ser aceptado por quien esté incluyendo la funcionalidad.
 
-1. Hacer Fork del proyecto
-2. Cree su rama de la funcionalidad (`git checkout -b feature/AmazingFeature`)
-3. Haga commit de sus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Haga push a la Branch (`git push origin feature/AmazingFeature`)
-5. Abra un Pull Request
+Es crucial que el nombre de las ramas creadas sea lo más descriptivo posible. Por ejemplo, si trabajamos en una nueva funcionalidad relacionada con la API, la rama se debe llamar `feature-api`. En el caso de tratarse de la corrección de un error en el código de la API, la llamaremos `fix-api`.
 
-Para coolaborar dentro del equipo utilizaremos **GitHub Workflow**, con el cual, cada miembro que trabaje en alguna funcionalidad nueva deberá crear una rama para dicha funcionalidad, trabajar sobre ella y luego hacer un Pull Request. Los pasos son los mismos que los de arriba, solo que el paso 1 es un `git pull ...`
+Además, se contarán con ramas específicas para la documentación con Mkdocs, denominadas `docs`, y para el README, que se llamará `readme`.
+
+La duración de cada rama dependerá de la necesidad de trabajo. Por ejemplo, las ramas `readme` y `docs` podrían mantenerse en remoto sin eliminarse durante todo el trabajo. Luego, se pueden añadir nuevos commits a ellas y volver a crear un "PR". En contraste, al trabajar con partes de la base de datos o la API, las ramas deberán durar hasta la finalización de la funcionalidad, para luego eliminarse del repositorio remoto y continuar con una nueva rama para cualquier otra nueva característica.
+
+### Creación y publicación de ramas
+
+Para crear una nueva rama desde tu entorno local:
+
+```sh
+git checkout -b <nombre-de-la-nueva-rama> <nombre-de-la-rama-origen>
+```
+
+Para publicar la nueva rama en el repositorio remoto:
+
+```sh
+# en <nombre-de-la-nueva-rama>
+git push --set-upstream origin <nombre-de-la-nueva-rama>
+```
+
+### Solicitud de PRs
+
+Para solicitar un PR, recomendamos realizarlo directamente desde la interfaz de GitHub.
+
+![Crear una PR - Paso 1/2](images/create-pr-1.png)
+
+![Crear una PR - Paso 2/2](images/create-pr-2.png)
+
+Finalmente, haz clic en "Create pull request" y espera la aprobación.
+
+### Commits convencionales
+
+Los commits convencionales nos permiten mantener la organización al realizar los commits y facilitan la creación de `releases` de forma automatizada.
+
+Se basan en el uso de palabras clave al inicio del mensaje de cada commit, de la siguiente manera:
+
+* **feat(tema de la modificación): Breve explicación**: Para cambios significativos o nuevas características.
+  
+* **chore(tema de la modificación): Breve explicación**: Para cambios menores, como modificar una IP para una prueba local.
+  
+* **fix(tema de la modificación): Breve explicación**: Para correcciones pequeñas, como agregar acentos en la documentación.
+
+Ejemplo:
+
+```
+feat(API): Añadir archivo de la API
+```
+
+Además, es importante **sectorizar por tema** los commits. Por ejemplo, si tu commit modifica 3 archivos relacionados con la API y uno con la documentación, al realizar el commit de la API, `feat(API)`, **no agregaremos a la etapa de preparación** el archivo de documentación, solo los 3 archivos de la API.
+
+### Eliminación de ramas del repositorio remoto y sincronización del repositorio local
+
+Para eliminar las ramas obsoletas del repositorio remoto, se realizará a través de la interfaz de GitHub, en la sección `Branches`.
+
+![Eliminar rama - Paso 1/3](images/delete-branch-1.png)
+
+Luego, se accede a ver todas las ramas:
+
+![Eliminar rama - Paso 2/3](images/delete-branch-2.png)
+
+Finalmente, se hace clic para eliminar la rama:
+
+![Eliminar rama - Paso 3/3](images/delete-branch-3.png)
+
+Una vez eliminada la rama, si se desea, se puede sincronizar el entorno local siguiendo estos pasos:
+
+* Listar las ramas que pueden ser eliminadas del entorno local:
+
+  ```sh
+  git remote prune origin --dry-run
+  ```
+
+* Limpiar las referencias locales:
+
+  ```sh
+  git remote prune origin
+  ```
+
+* Verificar el estado de las ramas locales:
+
+  ```sh
+  git branch -a
+  ```
+
+  Se comprobará que la rama remota ha sido eliminada, pero la rama local aún permanece.
+
+* Eliminar la rama local:
+
+  ```sh
+  git branch -d <nombre-de-la-rama-a-borrar>
+  ```
+
+Con estos pasos, el entorno local estará "sincronizado" con el remoto.
+
+### Uso del entorno virtual de Python - Poetry
+
+Para el entorno virtual de Python del proyecto, utilizamos Poetry. Esto nos permite trabajar con las mismas dependencias. Una vez instalado en tu PC y situado en el directorio del proyecto:
+
+* Para añadir nuevas dependencias:
+
+  ```sh
+  poetry add <nombre-de-la-dependencia>
+  ```
+
+* Para ejecutar un programa utilizando las dependencias del entorno:
+
+  ```sh
+  poetry run <comando-para-ejecutar-nuestro-programa>
+  ```
+
+Siempre utilizaremos el mismo entorno virtual. No se creará uno por carpeta, sino que todas las ejecuciones y adiciones de dependencias serán sobre el mismo archivo `.toml` creado en el directorio del proyecto.
+
+### Documentación temporal
+
+Cada vez que se cree una nueva funcionalidad, en la rama correspondiente y en el directorio respectivo, se debe crear una documentación temporal. Esto se realiza para evitar la pérdida de información al trasladarla a la documentación general en Mkdocs.
+
+La idea es crear un archivo Markdown dentro del directorio en el que se está trabajando con el siguiente nombre: `temp_docs_<nombre-de-la-funcionalidad-o-corrección>.md`.
+
+Este archivo será temporal y servirá para que aquellos que trabajen en la documentación de Mkdocs tengan toda la información a su alcance.
+
+Este archivo puede publicarse en la rama `main`. Solo se eliminará una vez se haya trasladado a la documentación general.
 
 [Back to Top](#top)
 
@@ -159,7 +262,6 @@ La Licencia MIT es una licencia de código abierto que permite un uso, modificac
 
 El aviso de copyright para este proyecto se encuentra en el archivo [LICENSE](LICENSE).
 
-
 [Back to Top](#top)
 
 <!-- CONTACT -->
@@ -167,35 +269,33 @@ El aviso de copyright para este proyecto se encuentra en el archivo [LICENSE](LI
 
 Agustín Aguilera Conti - [aagustinconti.com.ar](https://aagustinconti.com.ar) - <mail@aagustinconti.com.ar>
 
+Agustin Principe - <principeagustin@gmail.com>
+
 Link del proyecto: [Testing Apps TCP/IP](https://github.com/aagustinconti/testing_apps_tcpip)
 
 [Back to Top](#top)
 
 <!-- ACKNOWLEDGMENTS -->
-## Reconocimientos
+## Referencias
 
 Encontrá información importante en:
 
-* Añadir links importantes
+* [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+* [Semantic Releases](https://www.gitkraken.com/gitkon/semantic-versioning-git-tags#:~:text=Used%20along%20with%20Git%20tags,at%20them%20in%20the%20future)
+* [Poetry](https://python-poetry.org/docs/basic-usage/)
+* [Mkdocs Material](https://squidfunk.github.io/mkdocs-material/getting-started/)
+* [Markdown Badges](https://badges.pages.dev/)
 
 [Back to Top](#top)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[TensorFlow]: https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white
-[Tensorflow-url]: https://tensorflow.org
-[Docker]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
-[Docker-url]: https://docker.com
-[Pytorch]:https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white
-[Pytorch-url]: https://pytorch.org/
-[Kubernetes]: https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white
-[Kubernetes-url]: https://kubernetes.io
-[Ansible]: https://img.shields.io/badge/Ansible-000000?style=for-the-badge&logo=ansible&logoColor=white
-[Ansible-url]: https://www.ansible.com/
-[Terraform]: https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white
-[Terraform-url]: https://www.terraform.io/
 [Python]: https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue
 [Python-url]: https://www.python.org/
 
+[Grafana]: https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white
+[Grafana-url]: https://grafana.com/
 
+[K6]: https://img.shields.io/badge/k6-7D64FF?logo=k6&logoColor=fff&style=flat
+[K6-url]: https://k6.io/
