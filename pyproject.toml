@@ -9,6 +9,11 @@ readme = "README.md"
 python = "^3.10"
 mkdocs = "1.5.2"
 ansible = "^8.5.0"
+fastapi = "^0.104.1"
+motor = "^3.3.1"
+uvicorn = "^0.23.2"
+python-dotenv = "^1.0.0"
+databases = "^0.8.0"
 
 
 [build-system]
