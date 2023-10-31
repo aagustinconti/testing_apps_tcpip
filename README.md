@@ -12,7 +12,7 @@
   <p align="center">
     Este es el repositorio que contiene el proyecto final de la materia 'Aplicaciones TCP/IP' de la carrera de Ingeniería de Telecomunicaciones.
     <br />
-    <a href="https://github.com/aagustinconti/testing_apps_tcpip"><strong>Explorar el contenido »</strong></a>
+    <a href="https://aagustinconti.github.io/testing_apps_tcpip/"><strong>Accedé a la documentación acá »</strong></a>
     <br />
 
 </div>
