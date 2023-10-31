@@ -33,3 +33,4 @@ else:
     MONGODB_URL = DatabaseURL(MONGODB_URL)
 
 database_name = MONGO_DB
+users_collection_name = "users"
