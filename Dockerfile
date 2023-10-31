@@ -1,12 +1,13 @@
 FROM python:3.10
 
-COPY ./poetry.lock
-COPY ./pyproject.toml
+RUN pip install poetry
 
-RUN pip install poetry && \
-    poetry config settings.virtualenvs.create false && \
-    poetry install
+COPY ./poetry.lock /
+COPY ./pyproject.toml /
 
-COPY .app /
+RUN poetry config virtualenvs.in-project false && \
+    poetry install --only=main --no-root
 
-CMD gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0
+COPY ./app /app
+
+CMD poetry run gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0
