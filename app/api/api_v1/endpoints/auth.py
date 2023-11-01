@@ -31,7 +31,7 @@ async def login(
 
 
 @router.post(
-    "/users",
+    "/users/add",
     response_model=UserInResponse,
     tags=["auth"],
     status_code=HTTP_201_CREATED,
