@@ -27,9 +27,10 @@ if not MONGODB_URL:
     MONGO_DB = os.getenv("MONGO_DB", "api")
 
     MONGODB_URL = DatabaseURL(
-        f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}"
+        f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_DB}?authSource=admin"
     )
 else:
     MONGODB_URL = DatabaseURL(MONGODB_URL)
 
 database_name = MONGO_DB
+users_collection_name = "users"
