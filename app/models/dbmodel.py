@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel, Field
 
 
 class DateTimeModelMixin(BaseModel):
-    created_at: Optional[datetime] = Schema(..., alias="createdAt")
-    updated_at: Optional[datetime] = Schema(..., alias="updatedAt")
+    created_at: Optional[datetime] = Field(..., alias="createdAt")
+    updated_at: Optional[datetime] = Field(..., alias="updatedAt")
 
 
 class DBModelMixin(DateTimeModelMixin):

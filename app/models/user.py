@@ -48,4 +48,4 @@ class UserInUpdate(RWModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     bio: Optional[str] = None
-    image: Optional[UrlStr] = None
+    image: Optional[AnyUrl] = None
