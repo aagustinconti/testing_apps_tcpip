@@ -13,7 +13,7 @@ from ....models.user import User, UserInCreate, UserInLogin, UserInResponse
 router = APIRouter()
 
 
-@router.post("/users/login", response_model=UserInResponse, tags=["authentication"])
+@router.post("/users/login", response_model=UserInResponse, tags=["auth"])
 async def login(
         user: UserInLogin = Body(..., embed=True), db: AsyncIOMotorClient = Depends(get_database)
 ):
@@ -27,13 +27,13 @@ async def login(
     token = create_access_token(
         data={"username": dbuser.username}, expires_delta=access_token_expires
     )
-    return UserInResponse(user=User(**dbuser.dict(), token=token))
+    return UserInResponse(user=User(**dbuser.model_dump(), token=token))
 
 
 @router.post(
     "/users",
     response_model=UserInResponse,
-    tags=["authentication"],
+    tags=["auth"],
     status_code=HTTP_201_CREATED,
 )
 async def register(
@@ -50,4 +50,4 @@ async def register(
                 data={"username": dbuser.username}, expires_delta=access_token_expires
             )
 
-            return UserInResponse(user=User(**dbuser.dict(), token=token))
+            return UserInResponse(user=User(**dbuser.model_dump(), token=token))
