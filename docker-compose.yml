@@ -33,6 +33,8 @@ services:
     image: tcp-ip
     env_file:
       - .env
+    environment:
+      MONGO_HOST: mongodb
     depends_on:
       - mongodb
     ports:
