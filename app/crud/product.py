@@ -1,5 +1,4 @@
 from ..db.mongodb import AsyncIOMotorClient
-from pydantic import EmailStr
 from bson.objectid import ObjectId
 
 from ..core.config import database_name, products_collection_name
@@ -41,10 +40,15 @@ async def update_product(conn: AsyncIOMotorClient, id: str, product: ProductInUp
 
     dbproduct.name = product.name or dbproduct.name
     dbproduct.price = product.price or dbproduct.price
+    dbproduct.amount = product.amount or dbproduct.amount
     dbproduct.description = product.description or dbproduct.description
     dbproduct.image = product.image or dbproduct.image
 
     updated_at = await conn[database_name][products_collection_name]\
-        .update_one({"username": dbproduct.username}, {'$set': dbproduct.model_dump()})
+        .update_one({"_id": id}, {'$set': dbproduct.model_dump()})
     dbproduct.updated_at = updated_at
     return dbproduct
+
+
+async def remove_product(conn: AsyncIOMotorClient, id: str):
+    await conn[database_name][products_collection_name].delete_one({"_id": id})
