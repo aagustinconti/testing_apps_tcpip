@@ -33,6 +33,14 @@ async def _get_current_user(
 ) -> User:
     try:
         payload = jwt.decode(token, str(SECRET_KEY), algorithms=[ALGORITHM])
+
+        exp = payload.get("exp", None)
+
+        if exp is None or exp < datetime.utcnow():
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail="Token has expired or is invalid"
+            )
+
         token_data = TokenPayload(**payload)
     except PyJWTError:
         raise HTTPException(
@@ -44,7 +52,7 @@ async def _get_current_user(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND,
                             detail="User not found")
 
-    user = User(**dbuser.dict(), token=token)
+    user = User(**dbuser.model_dump(), token=token)
     return user
 
 
