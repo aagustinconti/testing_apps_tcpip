@@ -36,7 +36,7 @@ class ProductInCreate(ProductBase):
 
 
 class ProductInUpdate(RWModel):
-    product_code: Optional[str] = None
+    product_code: str
     name: Optional[str] = None
     price: Optional[int] = None
     amount: Optional[int] = None

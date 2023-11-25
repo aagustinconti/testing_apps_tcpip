@@ -1,3 +1,4 @@
+from datetime import datetime
 from ..db.mongodb import AsyncIOMotorClient
 from bson.objectid import ObjectId
 
@@ -52,9 +53,10 @@ async def update_product(conn: AsyncIOMotorClient, code: str, product: ProductIn
     dbproduct.description = product.description or dbproduct.description
     dbproduct.image = product.image or dbproduct.image
 
-    updated_at = await conn[database_name][products_collection_name]\
+    dbproduct.updated_at = datetime.now()
+    await conn[database_name][products_collection_name]\
         .update_one({"product_code": code}, {'$set': dbproduct.model_dump()})
-    dbproduct.updated_at = updated_at
+
     return dbproduct
 
 
