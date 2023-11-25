@@ -152,3 +152,13 @@ Y luego aprovisionamos con:
 ```sh
 ansible-playbook -vvv ansible/site.yml -i ansible/inventory_local.yml
 ```
+
+## Acceso a los nodos mediante SSH
+
+Para acceder al nodo master:
+
+```sh
+ssh -i ~/.ssh/vagrant_key vagrant@192.168.100.171
+```
+
+Si queremos entrar como `root` simplemente cambiamos el usuario a root.
