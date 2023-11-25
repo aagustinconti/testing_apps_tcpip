@@ -6,10 +6,12 @@ k8s/.vagrant
 k8s/shared_folder/*
 !k8s/shared_folder/configs/
 !k8s/shared_folder/*.yaml
+k8s/shared_folder/calico.yaml
 
 k8s/shared_folder/configs/*
 !k8s/shared_folder/configs/*.yml
 !k8s/shared_folder/configs/*.yaml
+
 
 
 
