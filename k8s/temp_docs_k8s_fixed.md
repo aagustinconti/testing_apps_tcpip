@@ -10,12 +10,18 @@ Para comenzar un proyecto de Vagrant en el directorio /vagrant, el usuario puede
 
 Antes que nada, necesitás instalar Vagrant en tu máquina. Esto se puede hacer descargando el instalador desde el sitio oficial y siguiendo las [instrucciones](https://developer.hashicorp.com/vagrant/tutorials/getting-started/getting-started-install)
 
+### Instalar el provider de VirtualBox
+
+Descargar de la  [página oficial](https://www.virtualbox.org/wiki/Linux_Downloads).
+
 **¡Importante!** Para poder configurar cierta red privada deberemos crear o modificar el archivo `/etc/vbox/networks.conf` añadiendo la red de la siguiente manera:
 
 ```ruby
 sudo su
-echo "* 0.0.0.0/0" > networks.conf
+echo "* 0.0.0.0/0" > /etc/vbox/networks.conf
 ```
+
+
 
 ### Crear las claves públicas y privadas para las conexiones SSH
 
