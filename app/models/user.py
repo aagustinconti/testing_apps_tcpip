@@ -25,6 +25,7 @@ class UserInDB(DBModelMixin, UserBase):
 
 
 class User(UserBase):
+    _id: str
     token: str
 
 
