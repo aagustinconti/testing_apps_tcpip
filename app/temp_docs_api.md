@@ -30,10 +30,10 @@ El cual dara de baja el contenedor de la api y la api debera ser iniciada con el
 
 ```bash
 # Usando poetry
-poetry run uvicorn app.main:app
+poetry run uvicorn app.main:app --reload
 
 # o si la terminal ya se encuentra en el entorno virtual
-uvicorn app.main:app
+uvicorn app.main:app --reload
 ```
 
 ## Estructura

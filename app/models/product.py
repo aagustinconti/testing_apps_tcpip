@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import ClassVar, Optional
 
 from pydantic import AnyUrl
 
@@ -16,7 +16,7 @@ class ProductBase(RWModel):
 
 
 class ProductInDB(DBModelMixin, ProductBase):
-    owner_id = str
+    owner_id: str = ""
 
 
 class Product(ProductBase):
@@ -32,7 +32,7 @@ class ProductInResponse(RWModel):
 
 
 class ProductInCreate(ProductBase):
-    owner_id = str
+    owner_id: str
 
 
 class ProductInUpdate(RWModel):

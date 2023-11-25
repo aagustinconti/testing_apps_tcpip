@@ -4,33 +4,41 @@ from bson.objectid import ObjectId
 from ..core.config import database_name, products_collection_name
 from ..models.product import ProductInCreate, ProductInDB, ProductInUpdate
 
+
 async def get_product(conn: AsyncIOMotorClient, code: str):
     row = await conn[database_name][products_collection_name].find_one({"product_code": code})
     if row:
         return ProductInDB(**row)
 
+
+async def get_products(conn: AsyncIOMotorClient, code_like: str) -> list[ProductInDB]:
+    cursor = conn[database_name][products_collection_name].find(
+        {"product_code": {"$regex": str(code_like), "$options": "i"}})
+    products = await cursor.to_list(length=None)
+    return [ProductInDB(**product) for product in products]
+
+
 async def get_product_by_name(conn: AsyncIOMotorClient, name_like: str):
-    row = await conn[database_name][products_collection_name].find_one({"name": {"$regex": name_like, "$options": "i"} })
+    row = await conn[database_name][products_collection_name].find_one({"name": {"$regex": name_like, "$options": "i"}})
     if row:
         return ProductInDB(**row)
 
-async def get_products_by_name(conn: AsyncIOMotorClient, name_like: str):
-    row = await conn[database_name][products_collection_name].find({"name": {"$regex": name_like, "$options": "i"} })
-    if row:
-        products = []
-        for product in row:
-            products.append(ProductInDB(**product))
 
-        return products
+async def get_products_by_name(conn: AsyncIOMotorClient, name_like: str) -> list[ProductInDB]:
+    cursor = conn[database_name][products_collection_name].find(
+        {"name": {"$regex": str(name_like), "$options": "i"}})
+    products = await cursor.to_list(length=None)
+    return [ProductInDB(**product) for product in products]
 
 
 async def create_product(conn: AsyncIOMotorClient, product: ProductInCreate) -> ProductInDB:
     dbproduct = ProductInDB(**product.model_dump())
 
-    await conn[database_name][products_collection_name].insert_one(dbproduct.model_dump())
+    result = await conn[database_name][products_collection_name].insert_one(dbproduct.model_dump())
+    inserted_id = result.inserted_id
 
-    dbproduct.created_at = ObjectId(dbproduct._id).generation_time
-    dbproduct.updated_at = ObjectId(dbproduct._id).generation_time
+    dbproduct.created_at = ObjectId(inserted_id).generation_time
+    dbproduct.updated_at = ObjectId(inserted_id).generation_time
 
     return dbproduct
 
