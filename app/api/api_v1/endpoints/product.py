@@ -6,7 +6,7 @@ from fastapi import APIRouter, Body, Depends
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 
-from app.crud.shortcuts import check_free_username_and_email, check_free_product_code, check_is_product_owner, check_is_valid_amout, check_is_valid_code, check_is_valid_price
+from app.crud.shortcuts import check_free_product_code, check_is_product_owner, check_is_valid_amout, check_is_valid_code, check_is_valid_name, check_is_valid_price
 
 from ....core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ....core.jwt import get_current_user
@@ -52,6 +52,7 @@ async def product_add(
         user=Depends(get_current_user),
         db: AsyncIOMotorClient = Depends(get_database)
 ):
+    check_is_valid_name(new_product.name)
     check_is_valid_code(new_product.product_code)
     check_is_valid_amout(new_product.amount)
     check_is_valid_price(new_product.price)
@@ -79,10 +80,11 @@ async def product_update(
         user=Depends(get_current_user),
         db: AsyncIOMotorClient = Depends(get_database)
 ):
-    await check_is_product_owner(db, user_id=user.id, product_code=new_product.product_code)
-
+    check_is_valid_name(new_product.name)
     check_is_valid_amout(new_product.amount)
     check_is_valid_price(new_product.price)
+
+    await check_is_product_owner(db, user_id=user.id, product_code=new_product.product_code)
 
     if new_product.price:
         new_product.price = round(new_product.price, 2)

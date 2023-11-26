@@ -61,16 +61,14 @@ async def check_is_product_owner(
 
 
 def check_is_valid_code(product_code: str):
-
-    if len(product_code) == 13:
+    if len(product_code) < 8 or len(product_code) > 15:
         raise HTTPException(
             status_code=HTTP_412_PRECONDITION_FAILED,
-            detail='Code must have 13 digits'
+            detail='Code must be between 8 and 15 digits'
         )
 
 
 def check_is_valid_amout(value: Optional[int] = None):
-
     if value and value > 0:
         raise HTTPException(
             status_code=HTTP_412_PRECONDITION_FAILED,
@@ -83,4 +81,12 @@ def check_is_valid_price(price: Optional[float] = None):
         raise HTTPException(
             status_code=HTTP_412_PRECONDITION_FAILED,
             detail='Price must be positive'
+        )
+
+
+def check_is_valid_name(name: Optional[str] = None):
+    if name and (len(name) < 3 or len(name) > 50):
+        raise HTTPException(
+            status_code=HTTP_412_PRECONDITION_FAILED,
+            detail='Name must be between 3 and 50 digits'
         )
