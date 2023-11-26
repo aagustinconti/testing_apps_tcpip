@@ -14,13 +14,13 @@ async def get_product(conn: AsyncIOMotorClient, code: str):
 
 async def get_products(conn: AsyncIOMotorClient, code_like: str) -> list[ProductInDB]:
     cursor = conn[database_name][products_collection_name].find(
-        {"product_code": {"$regex": str(code_like), "$options": "i"}})
+        {"product_code": {"$regex": f"^{code_like}", "$options": "i"}})
     products = await cursor.to_list(length=None)
     return [ProductInDB(**product) for product in products]
 
 
 async def get_product_by_name(conn: AsyncIOMotorClient, name_like: str):
-    row = await conn[database_name][products_collection_name].find_one({"name": {"$regex": name_like, "$options": "i"}})
+    row = await conn[database_name][products_collection_name].find_one({"name": {"$regex": f"^{name_like}", "$options": "i"}})
     if row:
         return ProductInDB(**row)
 

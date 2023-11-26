@@ -11,7 +11,7 @@ class ProductBase(RWModel):
     name: str
     price: int
     amount: int
-    image: Optional[AnyUrl] = None
+    image: Optional[str] = None
     description: Optional[str] = None
 
 
@@ -27,7 +27,7 @@ class ProductInResponse(RWModel):
     name: str
     price: int
     amount: int
-    image: Optional[AnyUrl] = None
+    image: Optional[str] = None
     description: Optional[str] = None
 
 
@@ -40,5 +40,10 @@ class ProductInUpdate(RWModel):
     name: Optional[str] = None
     price: Optional[int] = None
     amount: Optional[int] = None
-    image: Optional[AnyUrl] = None
+    image: Optional[str] = None
     description: Optional[str] = None
+
+
+class ProductInSearch(RWModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
