@@ -1,4 +1,5 @@
 from typing import Optional
+from bson import ObjectId
 
 from pydantic import EmailStr, AnyUrl
 
@@ -13,6 +14,7 @@ class UserBase(RWModel):
 
 
 class UserInDB(DBModelMixin, UserBase):
+    obj_id: str
     salt: str = ""
     hashed_password: str = ""
 
@@ -25,7 +27,7 @@ class UserInDB(DBModelMixin, UserBase):
 
 
 class User(UserBase):
-    _id: str
+    id: str
     token: str
 
 
