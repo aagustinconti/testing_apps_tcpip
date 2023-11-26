@@ -6,6 +6,7 @@ from starlette.status import (
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
+    HTTP_412_PRECONDITION_FAILED
 )
 
 from .user import get_user, get_user_by_email
@@ -57,3 +58,29 @@ async def check_is_product_owner(
                 status_code=HTTP_403_FORBIDDEN,
                 detail="You can't update this product"
             )
+
+
+def check_is_valid_code(product_code: str):
+
+    if len(product_code) == 13:
+        raise HTTPException(
+            status_code=HTTP_412_PRECONDITION_FAILED,
+            detail='Code must have 13 digits'
+        )
+
+
+def check_is_valid_amout(value: Optional[int] = None):
+
+    if value and value > 0:
+        raise HTTPException(
+            status_code=HTTP_412_PRECONDITION_FAILED,
+            detail='Amount must be positive'
+        )
+
+
+def check_is_valid_price(price: Optional[float] = None):
+    if price and price > 0:
+        raise HTTPException(
+            status_code=HTTP_412_PRECONDITION_FAILED,
+            detail='Price must be positive'
+        )

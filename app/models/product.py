@@ -9,7 +9,7 @@ from .rwmodel import RWModel
 class ProductBase(RWModel):
     product_code: str
     name: str
-    price: int
+    price: float
     amount: int
     image: Optional[str] = None
     description: Optional[str] = None
@@ -24,8 +24,9 @@ class Product(ProductBase):
 
 
 class ProductInResponse(RWModel):
+    product_code: str
     name: str
-    price: int
+    price: float
     amount: int
     image: Optional[str] = None
     description: Optional[str] = None
@@ -38,7 +39,7 @@ class ProductInCreate(ProductBase):
 class ProductInUpdate(RWModel):
     product_code: str
     name: Optional[str] = None
-    price: Optional[int] = None
+    price: Optional[float] = None
     amount: Optional[int] = None
     image: Optional[str] = None
     description: Optional[str] = None
