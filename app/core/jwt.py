@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import Depends, Header
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from starlette.exceptions import HTTPException
@@ -12,8 +12,7 @@ from ..db.mongodb import AsyncIOMotorClient, get_database
 from ..models.token import TokenPayload
 from ..models.user import User
 
-from .config import ACCESS_TOKEN_EXPIRE_MINUTES, JWT_TOKEN_PREFIX, SECRET_KEY
-import logging
+from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY
 
 ALGORITHM = "HS256"
 

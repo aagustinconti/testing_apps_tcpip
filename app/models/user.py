@@ -1,7 +1,5 @@
 from typing import Optional
-from bson import ObjectId
-
-from pydantic import EmailStr, AnyUrl
+from pydantic import EmailStr
 
 from .dbmodel import DBModelMixin
 from .rwmodel import RWModel

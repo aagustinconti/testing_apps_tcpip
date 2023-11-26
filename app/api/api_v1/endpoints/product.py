@@ -1,14 +1,11 @@
 from datetime import timedelta
-import logging
 from typing import List, Optional
 
 from fastapi import APIRouter, Body, Depends
-from starlette.exceptions import HTTPException
-from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_201_CREATED
 
 from app.crud.shortcuts import check_free_product_code, check_is_product_owner, check_is_valid_amout, check_is_valid_code, check_is_valid_name, check_is_valid_price
 
-from ....core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ....core.jwt import get_current_user
 from ....crud.product import create_product, get_product, get_products, get_product_by_name, get_products_by_name, update_product
 from ....db.mongodb import AsyncIOMotorClient, get_database
