@@ -2,12 +2,12 @@ from datetime import timedelta
 from typing import List, Optional
 
 from fastapi import APIRouter, Body, Depends
-from starlette.status import HTTP_201_CREATED
+from starlette.status import HTTP_201_CREATED, HTTP_200_OK
 
 from app.crud.shortcuts import check_free_product_code, check_is_product_owner, check_is_valid_amout, check_is_valid_code, check_is_valid_name, check_is_valid_price
 
 from ....core.jwt import get_current_user
-from ....crud.product import create_product, get_product, get_products, get_product_by_name, get_products_by_name, update_product
+from ....crud.product import create_product, get_product, get_products, get_product_by_name, get_products_by_name, remove_product, update_product
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from ....models.product import ProductInResponse, ProductInCreate, ProductInUpdate
 
@@ -88,3 +88,16 @@ async def product_update(
 
     updated_product = await update_product(db, new_product.product_code, product=new_product)
     return ProductInResponse(**updated_product.model_dump())
+
+
+@router.post('/product/remove', tags=["products"], status_code=HTTP_200_OK)
+async def product_remove(
+    product_code=str,
+    user=Depends(get_current_user),
+    db: AsyncIOMotorClient = Depends(get_database)
+):
+
+    await check_is_product_owner(db, user_id=user.id, product_code=product_code, scope='remove')
+    await remove_product(db, product_code)
+
+    return f'Product {product_code} removed'

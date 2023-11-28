@@ -5,7 +5,8 @@ from starlette.exceptions import HTTPException
 from starlette.status import (
     HTTP_403_FORBIDDEN,
     HTTP_422_UNPROCESSABLE_ENTITY,
-    HTTP_412_PRECONDITION_FAILED
+    HTTP_412_PRECONDITION_FAILED,
+    HTTP_404_NOT_FOUND
 )
 
 from .user import get_user, get_user_by_email
@@ -46,7 +47,7 @@ async def check_free_product_code(
 
 
 async def check_is_product_owner(
-        conn: AsyncIOMotorClient, user_id: Optional[str] = None, product_code: Optional[str] = None
+        conn: AsyncIOMotorClient, user_id: Optional[str] = None, product_code: Optional[str] = None, scope: Optional[str] = "update"
 ):
 
     if user_id and product_code:
@@ -55,8 +56,13 @@ async def check_is_product_owner(
         if not product or product.owner_id != user_id:
             raise HTTPException(
                 status_code=HTTP_403_FORBIDDEN,
-                detail="You can't update this product"
+                detail=f"You can't {scope} this product"
             )
+
+    raise HTTPException(
+        status_code=HTTP_404_NOT_FOUND,
+        detail='Product not found'
+    )
 
 
 def check_is_valid_code(product_code: str):
