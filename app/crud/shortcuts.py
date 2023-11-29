@@ -6,11 +6,12 @@ from starlette.status import (
     HTTP_403_FORBIDDEN,
     HTTP_422_UNPROCESSABLE_ENTITY,
     HTTP_412_PRECONDITION_FAILED,
-    HTTP_404_NOT_FOUND
+    HTTP_400_BAD_REQUEST
 )
 
 from .user import get_user, get_user_by_email
 from .product import get_product
+from .image import get_image
 from ..db.mongodb import AsyncIOMotorClient
 
 
@@ -60,7 +61,7 @@ async def check_is_product_owner(
             )
 
     raise HTTPException(
-        status_code=HTTP_404_NOT_FOUND,
+        status_code=HTTP_400_BAD_REQUEST,
         detail='Product not found'
     )
 
@@ -95,3 +96,21 @@ def check_is_valid_name(name: Optional[str] = None):
             status_code=HTTP_412_PRECONDITION_FAILED,
             detail='Name must be between 3 and 50 digits'
         )
+
+
+async def check_is_image_owner(
+        conn: AsyncIOMotorClient, user_id: Optional[str] = None, image_id: Optional[str] = None):
+
+    if user_id and image_id:
+        image = await get_image(conn, image_id)
+
+        if not image or image.owner_id != user_id:
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN,
+                detail=f"You can't remove this image"
+            )
+
+    raise HTTPException(
+        status_code=HTTP_400_BAD_REQUEST,
+        detail='Image not found'
+    )

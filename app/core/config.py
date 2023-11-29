@@ -35,3 +35,4 @@ else:
 database_name = MONGO_DB
 users_collection_name = "users"
 products_collection_name = "products"
+images_collection_name = "images"

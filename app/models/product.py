@@ -1,6 +1,4 @@
-from typing import ClassVar, Optional
-
-from pydantic import AnyUrl
+from typing import Optional
 
 from .dbmodel import DBModelMixin
 from .rwmodel import RWModel
