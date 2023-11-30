@@ -28,11 +28,13 @@ services:
 
   api:
     build:
-      dockerfile: Dockerfile
+      dockerfile: ./app/Dockerfile
       context: .
     image: tcp-ip
     env_file:
       - .env
+    environment:
+      MONGO_HOST: mongodb
     depends_on:
       - mongodb
     ports:

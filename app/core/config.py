@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 from starlette.datastructures import CommaSeparatedStrings, Secret
 from databases import DatabaseURL
 
-API_V1_STR = "/api"
+API_V1_STR = ""
+AUTH_ENDPOINT = f'{API_V1_STR}/auth/login'
 
 JWT_TOKEN_PREFIX = "Token"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # one week
@@ -34,3 +35,5 @@ else:
 
 database_name = MONGO_DB
 users_collection_name = "users"
+products_collection_name = "products"
+images_collection_name = "images"
