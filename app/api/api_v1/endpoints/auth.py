@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 from fastapi import APIRouter, Body, Depends
 from fastapi.security import OAuth2PasswordRequestForm
@@ -7,7 +8,7 @@ from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from app.crud.shortcuts import check_free_username_and_email
 
-from ....core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from ....core.config import ACCESS_TOKEN_EXPIRE_MINUTES, AUTH_ENDPOINT
 from ....core.jwt import create_access_token
 from ....crud.user import create_user, get_user_by_email
 from ....db.mongodb import AsyncIOMotorClient, get_database
@@ -17,7 +18,7 @@ from ....models.token import Token
 router = APIRouter()
 
 
-@router.post("/auth/login", response_model=Token, tags=["auth"])
+@router.post(AUTH_ENDPOINT, response_model=Token, tags=["auth"])
 async def login(
         user: OAuth2PasswordRequestForm = Depends(), db: AsyncIOMotorClient = Depends(get_database)
 ):

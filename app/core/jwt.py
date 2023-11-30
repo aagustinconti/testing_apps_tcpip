@@ -12,11 +12,11 @@ from ..db.mongodb import AsyncIOMotorClient, get_database
 from ..models.token import TokenPayload
 from ..models.user import User
 
-from .config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY
+from .config import ACCESS_TOKEN_EXPIRE_MINUTES, AUTH_ENDPOINT, SECRET_KEY
 
 ALGORITHM = "HS256"
 
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='api/auth/login')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl=AUTH_ENDPOINT)
 
 
 async def get_current_user(
