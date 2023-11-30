@@ -36,6 +36,14 @@ poetry run uvicorn app.main:app --reload
 uvicorn app.main:app --reload
 ```
 
+### Buildear imagen
+
+Para buildear la imagen se debe hacer uso del siguiente comando:
+
+```bash
+docker build -f ./app/Dockerfile .
+```
+
 ## Estructura
 
 Para mejor organizacion del proyecto, este se organizara internamente por carpetas:
@@ -91,4 +99,3 @@ Esta carpeta contiene las clases de datos a utilizar por los endpoints y las fun
 ## main.py
 
 Se trata del core de la aplicacion, donde se inicializa el logging de informacion y errores, ademas de los midelware de la aplicacion y el router de la API.
-
