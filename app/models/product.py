@@ -11,10 +11,11 @@ class ProductBase(RWModel):
     amount: int
     image: Optional[str] = None
     description: Optional[str] = None
+    owner_id: str
 
 
 class ProductInDB(DBModelMixin, ProductBase):
-    owner_id: str = ""
+    pass
 
 
 class Product(ProductBase):
@@ -30,8 +31,13 @@ class ProductInResponse(RWModel):
     description: Optional[str] = None
 
 
-class ProductInCreate(ProductBase):
-    owner_id: str
+class ProductInCreate(RWModel):
+    product_code: str
+    name: str
+    price: float
+    amount: int
+    image: Optional[str] = None
+    description: Optional[str] = None
 
 
 class ProductInUpdate(RWModel):

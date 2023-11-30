@@ -60,8 +60,7 @@ async def product_add(
 
     async with await db.start_session() as s:
         async with s.start_transaction():
-            new_product.owner_id = user.id
-            dbproduct = await create_product(db, new_product)
+            dbproduct = await create_product(db, new_product, user.id)
 
             return ProductInResponse(**dbproduct.model_dump())
 

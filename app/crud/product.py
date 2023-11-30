@@ -32,8 +32,9 @@ async def get_products_by_name(conn: AsyncIOMotorClient, name_like: str) -> list
     return [ProductInDB(**product) for product in products]
 
 
-async def create_product(conn: AsyncIOMotorClient, product: ProductInCreate) -> ProductInDB:
-    dbproduct = ProductInDB(**product.model_dump())
+async def create_product(conn: AsyncIOMotorClient, product: ProductInCreate, owner_id: str) -> ProductInDB:
+
+    dbproduct = ProductInDB(**product.model_dump(), owner_id=owner_id)
 
     result = await conn[database_name][products_collection_name].insert_one(dbproduct.model_dump())
     inserted_id = result.inserted_id

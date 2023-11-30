@@ -75,7 +75,7 @@ def check_is_valid_code(product_code: str):
 
 
 def check_is_valid_amout(value: Optional[int] = None):
-    if value and value > 0:
+    if value and value < 0:
         raise HTTPException(
             status_code=HTTP_412_PRECONDITION_FAILED,
             detail='Amount must be positive'
@@ -83,7 +83,7 @@ def check_is_valid_amout(value: Optional[int] = None):
 
 
 def check_is_valid_price(price: Optional[float] = None):
-    if price and price > 0:
+    if price and price < 0:
         raise HTTPException(
             status_code=HTTP_412_PRECONDITION_FAILED,
             detail='Price must be positive'
