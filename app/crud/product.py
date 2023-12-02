@@ -32,6 +32,19 @@ async def get_products_by_name(conn: AsyncIOMotorClient, name_like: str) -> list
     return [ProductInDB(**product) for product in products]
 
 
+async def get_all_products(conn: AsyncIOMotorClient):
+    cursor = conn[database_name][products_collection_name].find({})
+    products = await cursor.to_list(length=None)
+    return [ProductInDB(**product) for product in products]
+
+
+async def get_products_by_owner(conn: AsyncIOMotorClient, owner_id: str):
+    cursor = conn[database_name][products_collection_name].find(
+        {owner_id: owner_id})
+    products = await cursor.to_list(length=None)
+    return [ProductInDB(**product) for product in products]
+
+
 async def create_product(conn: AsyncIOMotorClient, product: ProductInCreate, owner_id: str) -> ProductInDB:
 
     dbproduct = ProductInDB(**product.model_dump(), owner_id=owner_id)
