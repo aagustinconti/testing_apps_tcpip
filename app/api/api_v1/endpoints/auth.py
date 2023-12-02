@@ -28,10 +28,7 @@ async def login(
             status_code=HTTP_400_BAD_REQUEST, detail="Incorrect email or password"
         )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    token = create_access_token(
-        data={"username": dbuser.username}, expires_delta=access_token_expires
-    )
+    token = create_access_token(data={"username": dbuser.username})
 
     return Token(access_token=token, token_type='bearer')
 
@@ -50,10 +47,6 @@ async def register(
     async with await db.start_session() as s:
         async with s.start_transaction():
             dbuser = await create_user(db, user)
-            access_token_expires = datetime.utcnow() + timedelta(
-                minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-            token = create_access_token(
-                data={"username": dbuser.username}, expires_delta=access_token_expires
-            )
+            token = create_access_token(data={"username": dbuser.username})
 
-            return UserInResponse(user=User(**dbuser.model_dump(), token=token))
+            return UserInResponse(user=User(**dbuser.model_dump(), id=dbuser._id, token=token))
