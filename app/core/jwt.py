@@ -43,7 +43,7 @@ async def get_current_user(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND,
                             detail="User not found")
 
-    user = User(**dbuser.model_dump(), token=token, id=dbuser.obj_id)
+    user = User(**dbuser.model_dump(), token=token)
     return user
 
 

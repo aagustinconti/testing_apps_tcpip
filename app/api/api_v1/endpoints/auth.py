@@ -49,4 +49,4 @@ async def register(
             dbuser = await create_user(db, user)
             token = create_access_token(data={"username": dbuser.username})
 
-            return UserInResponse(user=User(**dbuser.model_dump(), id=dbuser._id, token=token))
+            return UserInResponse(user=User(**dbuser.model_dump(), token=token))

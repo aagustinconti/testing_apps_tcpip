@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from ..db.mongodb import AsyncIOMotorClient
 from bson.objectid import ObjectId
 
@@ -40,7 +41,7 @@ async def get_all_products(conn: AsyncIOMotorClient):
 
 async def get_products_by_owner(conn: AsyncIOMotorClient, owner_id: str):
     cursor = conn[database_name][products_collection_name].find(
-        {owner_id: owner_id})
+        {"owner_id": owner_id})
     products = await cursor.to_list(length=None)
     return [ProductInDB(**product) for product in products]
 
