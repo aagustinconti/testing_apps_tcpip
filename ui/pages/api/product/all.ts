@@ -1,11 +1,11 @@
-import { TOKEN_NAME } from "@/utils/constants";
+import { API_URL, TOKEN_NAME } from "@/utils/constants";
 import { serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function getAllProducts(req: NextApiRequest, res: NextApiResponse) {
     try {
 
-        const url = `${process.env.API_URL ?? 'http://127.0.0.1:8000'}/products/get/all`
+        const url = `${API_URL}/products/get/all`
 
         const response = await fetch(url, {
             method: 'get',

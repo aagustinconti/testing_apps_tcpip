@@ -1,4 +1,4 @@
-import { TOKEN_NAME } from "@/utils/constants";
+import { API_URL, TOKEN_NAME } from "@/utils/constants";
 import { serialize } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -6,7 +6,7 @@ async function loginHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
         const { email, password } = req.body;
 
-        const url = `${process.env.API_URL ?? 'http://127.0.0.1:8000'}/auth/login`
+        const url = `${API_URL}/auth/login`
 
         const response = await fetch(url, {
             method: 'POST',

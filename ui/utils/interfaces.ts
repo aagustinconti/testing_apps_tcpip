@@ -3,6 +3,6 @@ export interface IProduct {
     product_code: string
     price: number
     amount: number
-    image: string
-    description: string
+    image: string | null
+    description: string | null
 }

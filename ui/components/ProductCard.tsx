@@ -28,7 +28,7 @@ export function ProductCard(props: { product: IProduct }) {
             </Group>
 
             <Text mb="xs" c="dimmed" size="sm">
-                {props.product.description}
+                {props.product.description != null && props.product.description.length ? props.product.description : 'Sin descripcion'}
             </Text>
 
             <Group justify="space-between">
