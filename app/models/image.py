@@ -5,13 +5,12 @@ from .rwmodel import RWModel
 
 
 class ImageBase(RWModel):
-    id: str
     owner_id: str
     image_base64: str
 
 
 class ImageInDB(ImageBase):
-    pass
+    id: str
 
 
 class Image(ImageBase):
