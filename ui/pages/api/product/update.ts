@@ -28,7 +28,7 @@ export default async function updateProduct(req: NextApiRequest, res: NextApiRes
                     name: name,
                     price: price,
                     amount: amount,
-                    image: (image as string).length ? image : null,
+                    image: (image && (image as string).length) ? image : null,
                     description: (description as string).length ? description : null
                 }
             })

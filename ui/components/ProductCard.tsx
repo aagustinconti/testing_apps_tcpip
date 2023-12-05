@@ -33,7 +33,7 @@ export function ProductCard(props: {
 
         setLoading(true)
 
-        if (value.image.length) {
+        if (value.image && value.image.length) {
 
             const imgRes = await fetch('/api/image/add', {
                 method: 'post',
