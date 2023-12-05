@@ -10,7 +10,7 @@ import {
 } from '@tabler/icons-react'
 import { useRouter } from 'next/router';
 
-export function Navbar(props: { children: ReactNode }) {
+export function Navbar(props: { children: ReactNode, logged?: boolean }) {
     const [opened, { toggle }] = useDisclosure();
     const router = useRouter()
 
@@ -30,6 +30,9 @@ export function Navbar(props: { children: ReactNode }) {
                         <Group ml="xl" gap={0} visibleFrom="sm">
                             <UnstyledButton className={classes.control} onClick={() => router.push('/')}>Inicio</UnstyledButton>
                             <UnstyledButton className={classes.control} onClick={() => router.push('/admin')}>Administrar</UnstyledButton>
+                            {props.logged && (
+                                <UnstyledButton className={classes.control} onClick={() => router.push('/auth/logout')}>Cerrar sesion</UnstyledButton>
+                            )}
                         </Group>
                     </Group>
                 </Group>
