@@ -1,16 +1,17 @@
 import { useDisclosure } from '@mantine/hooks';
-import { AppShell, Burger, Group, UnstyledButton, Title } from '@mantine/core';
+import { AppShell, Burger, Group, UnstyledButton, Title, TextInput, rem, Tooltip } from '@mantine/core';
 import classes from './Navbar.module.css';
 
-import { ReactNode } from 'react';
+import { ChangeEventHandler, ReactNode } from 'react';
 
 import {
     IconHome,
+    IconSearch,
     IconSettings,
 } from '@tabler/icons-react'
 import { useRouter } from 'next/router';
 
-export function Navbar(props: { children: ReactNode, logged?: boolean }) {
+export function Navbar(props: { children: ReactNode, logged?: boolean, onSearchInput?: ChangeEventHandler<HTMLInputElement> }) {
     const [opened, { toggle }] = useDisclosure();
     const router = useRouter()
 
@@ -28,6 +29,17 @@ export function Navbar(props: { children: ReactNode, logged?: boolean }) {
                             Ferreteria SRL
                         </Title>
                         <Group ml="xl" gap={0} visibleFrom="sm">
+                            {props.onSearchInput && (
+                                <Tooltip label="Buscar por codigo o nombre de producto">
+                                    <TextInput
+                                        leftSectionPointerEvents="none"
+                                        leftSection={<IconSearch style={{ width: rem(16), height: rem(16) }} />}
+                                        placeholder="Buscar producto"
+                                        onChange={props.onSearchInput}
+                                    />
+                                </Tooltip>
+                            )}
+
                             <UnstyledButton className={classes.control} onClick={() => router.push('/')}>Inicio</UnstyledButton>
                             <UnstyledButton className={classes.control} onClick={() => router.push('/admin')}>Administrar</UnstyledButton>
                             {props.logged && (
@@ -39,6 +51,16 @@ export function Navbar(props: { children: ReactNode, logged?: boolean }) {
             </AppShell.Header>
 
             <AppShell.Navbar py="md" px={4}>
+
+                {props.onSearchInput && (
+                    <TextInput
+                        leftSectionPointerEvents="none"
+                        leftSection={<IconSearch style={{ width: rem(16), height: rem(16) }} />}
+                        placeholder="Buscar producto"
+                        onChange={props.onSearchInput}
+                    />
+                )}
+
                 <UnstyledButton className={classes.control} onClick={() => router.push('/')}>
                     <IconHome stroke={1.5} className={classes.controlIcon} />
                     <span>Inicio</span>
@@ -47,6 +69,9 @@ export function Navbar(props: { children: ReactNode, logged?: boolean }) {
                     <IconSettings stroke={1.5} className={classes.controlIcon} />
                     <span>Administrar</span>
                 </UnstyledButton>
+                {props.logged && (
+                    <UnstyledButton className={classes.control} onClick={() => router.push('/auth/logout')}>Cerrar sesion</UnstyledButton>
+                )}
             </AppShell.Navbar>
 
             <AppShell.Main>
