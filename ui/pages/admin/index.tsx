@@ -5,15 +5,13 @@ import { TOKEN_NAME } from '@/utils/constants';
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
 import { IProduct } from "@/utils/interfaces";
-import { Card, Grid, Text, Image, Group, Badge, NumberFormatter, Button, Modal, Paper, Title, Stack, TextInput, PasswordInput, FileButton, Avatar, NumberInput, Textarea } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { Grid, Group, Button } from "@mantine/core";
+import { useEffect, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { useForm } from "@mantine/form";
-import { IconFile } from "@tabler/icons-react";
-import ProductModalData from "@/components/ProductDataModal";
+import ProductDataModal from "@/components/ProductDataModal";
 
 
-export default function HomePage() {
+export default function HomePage(props: { logged: boolean }) {
 
     const router = useRouter()
 
@@ -79,18 +77,18 @@ export default function HomePage() {
 
     return (
         <>
-            <Navbar>
-                <ProductModalData opened={opened} close={close} onSubmit={onSubmit} loading={loading} />
+            <Navbar logged={props.logged}>
+                <ProductDataModal title="Nuevo producto" opened={opened} close={close} onSubmit={onSubmit} loading={loading} />
 
                 <Group grow wrap="nowrap" mb={'md'}>
-                    <Button onClick={open} >Agregar</Button>
+                    <Button onClick={open} variant="light" >Agregar</Button>
                 </Group>
 
                 <Grid>
                     {products.map((p, index) => {
                         return (
                             <Grid.Col span={{ base: 12, md: 4, lg: 2 }} key={index}>
-                                <ProductCard product={p} />
+                                <ProductCard product={p} edit delete />
                             </Grid.Col>
                         )
                     })}
@@ -126,7 +124,7 @@ export async function getServerSideProps(context: any) {
     }
 
     return {
-        props: {},
+        props: { logged: true },
     }
 
 }

@@ -1,8 +1,11 @@
+import { IProduct } from "@/utils/interfaces";
 import { Button, FileButton, Group, Modal, NumberInput, Stack, TextInput, Textarea, Image } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useRef, useState } from "react";
 
-export default function ProductModalData(props: {
+export default function ProductDataModal(props: {
+    title: string,
+    buttonText?: string
     opened: boolean,
     close: () => void,
     onSubmit: (
@@ -15,16 +18,17 @@ export default function ProductModalData(props: {
             image: string
         }) => Promise<void> | void,
     loading: boolean
+    values?: IProduct
 }) {
 
     const form = useForm({
 
         initialValues: {
-            name: '',
-            code: '',
-            price: 0,
-            amount: 0,
-            description: '',
+            name: props.values?.name ?? '',
+            code: props.values?.product_code ?? '',
+            price: props.values?.price ?? 0,
+            amount: props.values?.amount ?? 0,
+            description: props.values?.description ?? '',
         },
 
         validate: {
@@ -37,7 +41,7 @@ export default function ProductModalData(props: {
     });
 
     const [file, setFile] = useState<File | null>(null);
-    const [imgPreview, setImgPreview] = useState('')
+    const [imgPreview, setImgPreview] = useState(props.values?.image ?? '')
 
     const uploadFile = (file: File | null) => {
         if (file) {
@@ -65,7 +69,7 @@ export default function ProductModalData(props: {
     };
 
     return (
-        <Modal opened={props.opened} onClose={props.close} title="Nuevo producto" centered>
+        <Modal opened={props.opened} onClose={props.close} title={props.title} centered>
             <form onSubmit={form.onSubmit((val) => {
                 props.onSubmit({ ...val, image: imgPreview.split(',')[1] })
             })}>
@@ -116,10 +120,10 @@ export default function ProductModalData(props: {
 
                     <Group grow wrap="nowrap" >
                         <Stack>
-                            <FileButton onChange={uploadFile} accept="image/png,image/jpeg">
-                                {(props) => <Button {...props}>Subir imagen</Button>}
+                            <FileButton onChange={uploadFile} accept="image/png,image/jpeg" >
+                                {(props) => <Button variant="light" {...props}>{!imgPreview.length ? 'Subir imagen' : 'Remplezar imagen'}</Button>}
                             </FileButton>
-                            <Button disabled={!file} color="red" onClick={clearFile}>
+                            <Button disabled={(!file && !imgPreview.length)} color="red" onClick={clearFile} variant="light">
                                 Quitar imagen
                             </Button>
                         </Stack>
@@ -135,8 +139,8 @@ export default function ProductModalData(props: {
 
                 </Stack>
 
-                <Button fullWidth mt="xl" loading={props.loading} type="submit">
-                    Crear
+                <Button fullWidth mt="xl" loading={props.loading} type="submit" variant="light">
+                    {props.buttonText ?? 'Crear'}
                 </Button>
             </form>
         </Modal>
