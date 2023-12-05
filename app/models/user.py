@@ -13,7 +13,6 @@ class UserBase(RWModel):
 
 
 class UserInDB(DBModelMixin, UserBase):
-    id: str = ""
     salt: str = ""
     hashed_password: str = ""
 
