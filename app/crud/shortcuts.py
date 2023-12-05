@@ -60,6 +60,8 @@ async def check_is_product_owner(
                 detail=f"You can't {scope} this product"
             )
 
+        return
+
     raise HTTPException(
         status_code=HTTP_400_BAD_REQUEST,
         detail='Product not found'
@@ -109,6 +111,8 @@ async def check_is_image_owner(
                 status_code=HTTP_403_FORBIDDEN,
                 detail=f"You can't remove this image"
             )
+
+        return
 
     raise HTTPException(
         status_code=HTTP_400_BAD_REQUEST,
