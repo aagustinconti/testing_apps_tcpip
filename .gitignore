@@ -4,20 +4,12 @@ k8s/.vagrant
 
 
 k8s/shared_folder/*
-!k8s/shared_folder/configs/
-!k8s/shared_folder/*.yaml
-k8s/shared_folder/calico.yaml
-
-k8s/shared_folder/configs/*
-!k8s/shared_folder/configs/*.yml
-!k8s/shared_folder/configs/*.yaml
-
-
-
 
 k8s/ansible/configs/*
 !k8s/ansible/configs/*.yml
 !k8s/ansible/configs/*.yaml
+!k8s/ansible/configs/grafana/
+!k8s/ansible/configs/local_sc_rancher/
 
 
 # Byte-compiled / optimized / DLL files
