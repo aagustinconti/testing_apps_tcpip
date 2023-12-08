@@ -30,10 +30,18 @@ El cual dara de baja el contenedor de la api y la api debera ser iniciada con el
 
 ```bash
 # Usando poetry
-poetry run uvicorn app.main:app
+poetry run uvicorn app.main:app --reload
 
 # o si la terminal ya se encuentra en el entorno virtual
-uvicorn app.main:app
+uvicorn app.main:app --reload
+```
+
+### Buildear imagen
+
+Para buildear la imagen se debe hacer uso del siguiente comando:
+
+```bash
+docker build -f ./app/Dockerfile .
 ```
 
 ## Estructura
@@ -91,4 +99,3 @@ Esta carpeta contiene las clases de datos a utilizar por los endpoints y las fun
 ## main.py
 
 Se trata del core de la aplicacion, donde se inicializa el logging de informacion y errores, ademas de los midelware de la aplicacion y el router de la API.
-

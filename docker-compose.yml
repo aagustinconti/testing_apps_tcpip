@@ -28,7 +28,7 @@ services:
 
   api:
     build:
-      dockerfile: Dockerfile
+      dockerfile: ./app/Dockerfile
       context: .
     image: tcp-ip
     env_file:

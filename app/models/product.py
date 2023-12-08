@@ -1,7 +1,5 @@
 from typing import Optional
 
-from pydantic import AnyUrl
-
 from .dbmodel import DBModelMixin
 from .rwmodel import RWModel
 
@@ -9,14 +7,15 @@ from .rwmodel import RWModel
 class ProductBase(RWModel):
     product_code: str
     name: str
-    price: int
+    price: float
     amount: int
-    image: Optional[AnyUrl] = None
+    image: Optional[str] = None
     description: Optional[str] = None
+    owner_id: str
 
 
 class ProductInDB(DBModelMixin, ProductBase):
-    owner_id = str
+    pass
 
 
 class Product(ProductBase):
@@ -24,21 +23,32 @@ class Product(ProductBase):
 
 
 class ProductInResponse(RWModel):
+    product_code: str
     name: str
-    price: int
+    price: float
     amount: int
-    image: Optional[AnyUrl] = None
+    image: Optional[str] = None
     description: Optional[str] = None
 
 
-class ProductInCreate(ProductBase):
-    owner_id = str
+class ProductInCreate(RWModel):
+    product_code: str
+    name: str
+    price: float
+    amount: int
+    image: Optional[str] = None
+    description: Optional[str] = None
 
 
 class ProductInUpdate(RWModel):
-    product_code: Optional[str] = None
+    product_code: str
     name: Optional[str] = None
-    price: Optional[int] = None
+    price: Optional[float] = None
     amount: Optional[int] = None
-    image: Optional[AnyUrl] = None
+    image: Optional[str] = None
     description: Optional[str] = None
+
+
+class ProductInSearch(RWModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
