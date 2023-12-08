@@ -19,20 +19,20 @@ settings:
       ssh:
         user: "vagrant"
         password: "vagrant"
-        private_key_path: /home/aagustin/.ssh/vagrant_key # Crearse una para que funcione
-        public_key_path: /home/aagustin/.ssh/vagrant_key.pub # Crearse una para que funcione
+        private_key_path: /home/aagustin/.ssh/vagrant_key
+        public_key_path: /home/aagustin/.ssh/vagrant_key.pub
 
       nodes:
         control:
           cpu: 2
           memory: 4096 
         workers:
-          count: 2 
-          cpu: 2 
-          memory: 4096 
+          count: 1 
+          cpu: 4 
+          memory: 8192 
       
       network:
-        control_ip: 192.168.100.171
+        control_ip: 192.168.100.181
         dns_servers:
           - 8.8.8.8
           - 1.1.1.1
@@ -45,55 +45,50 @@ settings:
         calico: 3.25.0
         kubernetes: 1.26.1-00
         os: xUbuntu_22.04
- 
-        flannel: 0.23.0
-        contained: v1.5
+
     test_api_principe:
-        prod_test: false
-        
-        environment: ""
-        
-        user_dir_path: /home/agustin
-        node_home_dir: /home/vagrant
+      prod_test: false
+      
+      environment: ""
+      
+      user_dir_path: /home/agustin
+      node_home_dir: /home/vagrant
 
-        shared_folders:
-          - host_path: ./shared_folder
-            vm_path: /home/vagrant 
+      shared_folders:
+        - host_path: ./shared_folder
+          vm_path: /home/vagrant 
 
-        cluster_name: Kubernetes Cluster
-        
-        ssh:
-          user: "vagrant"
-          password: "vagrant"
-          private_key_path: /home/agustin/.ssh/vagrant_key # Crearse una para que funcione
-          public_key_path: /home/agustin/.ssh/vagrant_key.pub # Crearse una para que funcione
+      cluster_name: Kubernetes Cluster
+      
+      ssh:
+        user: "vagrant"
+        password: "vagrant"
+        private_key_path: /home/agustin/.ssh/vagrant_key
+        public_key_path: /home/agustin/.ssh/vagrant_key.pub
 
-        nodes:
-          control:
-            cpu: 2
-            memory: 4096 
-          workers:
-            count: 2 
-            cpu: 2 
-            memory: 4096 
-        
-        network:
-          control_ip: 10.0.100.171
-          dns_servers:
-            - 8.8.8.8
-            - 1.1.1.1
-          pod_cidr: 172.16.1.0/16
-          service_cidr: 172.17.1.0/18
-        
+      nodes:
+        control:
+          cpu: 2
+          memory: 4096 
+        workers:
+          count: 1 
+          cpu: 4 
+          memory: 8192 
+      
+      network:
+        control_ip: 10.0.100.181
+        dns_servers:
+          - 8.8.8.8
+          - 1.1.1.1
+        pod_cidr: 172.16.1.0/16
+        service_cidr: 172.17.1.0/18
+      
 
-        software:
-          box: bento/ubuntu-22.04
-          calico: 3.25.0
-          kubernetes: 1.26.1-00
-          os: xUbuntu_22.04
-  
-          flannel: 0.23.0
-          contained: v1.5
+      software:
+        box: bento/ubuntu-22.04
+        calico: 3.25.0
+        kubernetes: 1.26.1-00
+        os: xUbuntu_22.04
 
 # Ansible
 
@@ -122,8 +117,6 @@ KUBERNETES_VERSION: "{{ settings.users[settings.env].software.kubernetes }}"
 KUBERNETES_VERSION_SEC: "{{ settings.users[settings.env].software.kubernetes | regex_replace('([0-9]+\\.[0-9]+)\\..*', '\\1') }}"
 
 CALICO_VERSION: "{{ settings.users[settings.env].software.calico }}"
-CONTAINERD_VERSION: "{{ settings.users[settings.env].software.containerd }}"
-FLANNEL_VERSION: "{{ settings.users[settings.env].software.flannel }}"
 
 POD_CIDR: "{{ settings.users[settings.env].network.pod_cidr }}"
 SERVICE_CIDR: "{{ settings.users[settings.env].network.service_cidr }}"
