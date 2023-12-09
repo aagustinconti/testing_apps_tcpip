@@ -63,6 +63,8 @@ export function ProductCard(props: {
         if (res.status === 201) return router.reload()
 
         setLoading(false)
+        console.log(res)
+        console.log(await res.json())
     }
 
     return (
