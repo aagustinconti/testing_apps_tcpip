@@ -23,7 +23,7 @@ export default async function updateProduct(req: NextApiRequest, res: NextApiRes
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                new_product: {
+                product: {
                     product_code: code,
                     name: name,
                     price: price,
