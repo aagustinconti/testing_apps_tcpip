@@ -40,5 +40,17 @@ services:
     ports:
       - "8000:8000"
 
+  ui:
+    build:
+      context: ./ui
+    image: ui-tcp-ip
+    environment:
+      API_URL: http://api:8000
+      PORT: 80
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+
 volumes:
   db:
