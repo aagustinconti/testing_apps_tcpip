@@ -6,7 +6,6 @@ import { Card, Grid, Text, Image, Group, Badge, NumberFormatter } from "@mantine
 import { ChangeEvent, useEffect, useState } from "react";
 import cookie from "cookie";
 
-
 export default function HomePage(props: { logged: boolean }) {
 
 	const [products, setProducts] = useState<IProduct[]>([])
@@ -57,10 +56,10 @@ export default function HomePage(props: { logged: boolean }) {
 		<>
 			<Navbar logged={props.logged} onSearchInput={onSearch}>
 				<Grid>
-					{products.map(p => {
+					{products.map((p, i) => {
 						if (p.amount)
 							return (
-								<Grid.Col span={{ base: 12, md: 4, lg: 2 }}>
+								<Grid.Col span={{ base: 12, md: 4, lg: 2 }} key={i}>
 									<ProductCard product={p} />
 								</Grid.Col>
 							)
@@ -79,8 +78,6 @@ export async function getServerSideProps(context: any) {
 		const { req } = context;
 
 		const token = cookie.parse((req && req.headers.cookie) || null)[TOKEN_NAME];
-
-
 
 		return {
 			props: { logged: token !== null && token !== undefined },
