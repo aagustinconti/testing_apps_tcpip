@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import logging
 from typing import Optional
 
 from fastapi import Depends
@@ -6,9 +7,11 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from sqlalchemy.orm import Session
 
-from ..crud.user import get_user
-from ..db.mongodb import AsyncIOMotorClient, get_database
+from app.db.mysqlutils import get_db
+
+from ..crud.user import get_user, get_user_by_email
 from ..models.token import TokenPayload
 from ..models.user import User
 
@@ -20,7 +23,7 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl=AUTH_ENDPOINT)
 
 
 async def get_current_user(
-    db: AsyncIOMotorClient = Depends(get_database), token: str = Depends(oauth2_bearer)
+    db: Session = Depends(get_db), token: str = Depends(oauth2_bearer)
 ) -> User:
     try:
         payload = jwt.decode(token, str(SECRET_KEY), algorithms=[ALGORITHM])
@@ -33,17 +36,19 @@ async def get_current_user(
             )
 
         token_data = TokenPayload(**payload)
+
     except JWTError as err:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN, detail=f"Could not validate credentials {err}",
         )
 
-    dbuser = await get_user(db, token_data.username)
+    dbuser = await get_user_by_email(db, token_data.email)
+
     if not dbuser:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND,
                             detail="User not found")
 
-    user = User(**dbuser.model_dump(), token=token)
+    user = User(**dbuser.__dict__, token=token)
     return user
 
 

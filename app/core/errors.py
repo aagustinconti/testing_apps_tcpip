@@ -1,5 +1,4 @@
 from collections.abc import Iterable
-import logging
 
 from fastapi.openapi.constants import REF_PREFIX
 from fastapi.openapi.utils import (

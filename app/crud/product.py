@@ -1,65 +1,46 @@
 from datetime import datetime
 import logging
-from ..db.mongodb import AsyncIOMotorClient
-from bson.objectid import ObjectId
+from sqlalchemy.orm import Session
 
-from ..core.config import database_name, products_collection_name
 from ..models.product import ProductInCreate, ProductInDB, ProductInUpdate
 
 
-async def get_product(conn: AsyncIOMotorClient, code: str):
-    row = await conn[database_name][products_collection_name].find_one({"product_code": code})
-    if row:
-        return ProductInDB(**row)
+async def get_product(conn: Session, code: str):
+    return conn.query(ProductInDB).filter(ProductInDB.product_code == code).first()
 
 
-async def get_products(conn: AsyncIOMotorClient, code_like: str) -> list[ProductInDB]:
-    cursor = conn[database_name][products_collection_name].find(
-        {"product_code": {"$regex": f"^{code_like}", "$options": "i"}})
-    products = await cursor.to_list(length=None)
-    return [ProductInDB(**product) for product in products]
+async def get_products(conn: Session, code_like: str) -> list[ProductInDB]:
+    return conn.query(ProductInDB).filter(ProductInDB.product_code.like(f'{code_like}%')).all()
 
 
-async def get_product_by_name(conn: AsyncIOMotorClient, name_like: str):
-    row = await conn[database_name][products_collection_name].find_one({"name": {"$regex": f"^{name_like}", "$options": "i"}})
-    if row:
-        return ProductInDB(**row)
+async def get_product_by_name(conn: Session, name_like: str):
+    return conn.query(ProductInDB).filter(ProductInDB.name.like(f'{name_like}%')).first()
 
 
-async def get_products_by_name(conn: AsyncIOMotorClient, name_like: str) -> list[ProductInDB]:
-    cursor = conn[database_name][products_collection_name].find(
-        {"name": {"$regex": str(name_like), "$options": "i"}})
-    products = await cursor.to_list(length=None)
-    return [ProductInDB(**product) for product in products]
+async def get_products_by_name(conn: Session, name_like: str) -> list[ProductInDB]:
+    return conn.query(ProductInDB).filter(ProductInDB.name.like(f'{name_like}%')).all()
 
 
-async def get_all_products(conn: AsyncIOMotorClient):
-    cursor = conn[database_name][products_collection_name].find({})
-    products = await cursor.to_list(length=None)
-    return [ProductInDB(**product) for product in products]
+async def get_all_products(conn: Session):
+    return conn.query(ProductInDB).all()
 
 
-async def get_products_by_owner(conn: AsyncIOMotorClient, owner_id: str):
-    cursor = conn[database_name][products_collection_name].find(
-        {"owner_id": owner_id})
-    products = await cursor.to_list(length=None)
-    return [ProductInDB(**product) for product in products]
+async def get_products_by_owner(conn: Session, owner_id: int):
+    return conn.query(ProductInDB).filter(ProductInDB.owner_id == owner_id).all()
 
 
-async def create_product(conn: AsyncIOMotorClient, product: ProductInCreate, owner_id: str) -> ProductInDB:
+async def create_product(conn: Session, product: ProductInCreate, owner_id: str) -> ProductInDB:
 
     dbproduct = ProductInDB(**product.model_dump(), owner_id=owner_id)
 
-    result = await conn[database_name][products_collection_name].insert_one(dbproduct.model_dump())
-    inserted_id = result.inserted_id
-
-    dbproduct.created_at = ObjectId(inserted_id).generation_time
-    dbproduct.updated_at = ObjectId(inserted_id).generation_time
+    conn.add(dbproduct)
+    conn.commit()
+    conn.refresh(dbproduct)
 
     return dbproduct
 
 
-async def update_product(conn: AsyncIOMotorClient, code: str, product: ProductInUpdate):
+async def update_product(conn: Session, code: str, product: ProductInUpdate):
     dbproduct = await get_product(conn, code)
 
     dbproduct.name = product.name or dbproduct.name
@@ -68,12 +49,14 @@ async def update_product(conn: AsyncIOMotorClient, code: str, product: ProductIn
     dbproduct.description = product.description or dbproduct.description
     dbproduct.image = product.image or dbproduct.image
 
-    dbproduct.updated_at = datetime.now()
-    await conn[database_name][products_collection_name]\
-        .update_one({"product_code": code}, {'$set': dbproduct.model_dump()})
+    conn.flush()
+    conn.commit()
+    conn.refresh(dbproduct)
 
     return dbproduct
 
 
-async def remove_product(conn: AsyncIOMotorClient, code: str):
-    await conn[database_name][products_collection_name].delete_one({"product_code": code})
+async def remove_product(conn: Session, code: str):
+    dbproduct = await get_product(conn, code)
+    conn.delete(dbproduct)
+    conn.commit()

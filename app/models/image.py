@@ -1,7 +1,8 @@
-from typing import List, Optional
+from sqlalchemy import Column, Integer, String, LargeBinary
+import uuid
 
-from .dbmodel import DBModelMixin
 from .rwmodel import RWModel
+from ..db.mysqldb import Base
 
 
 class ImageBase(RWModel):
@@ -9,8 +10,13 @@ class ImageBase(RWModel):
     image_base64: str
 
 
-class ImageInDB(ImageBase):
-    id: str
+class ImageInDB(Base):
+    __tablename__ = 'images'
+
+    id = Column(String(36), nullable=False, primary_key=True,
+                default=uuid.uuid4, index=True)
+    owner_id = Column(Integer)
+    image_base64 = Column(LargeBinary)
 
 
 class Image(ImageBase):

@@ -2,7 +2,8 @@ from .rwmodel import RWModel
 
 
 class TokenPayload(RWModel):
-    username: str = ""
+    email: str = ""
+    id: int = 0
 
 
 class Token(RWModel):
