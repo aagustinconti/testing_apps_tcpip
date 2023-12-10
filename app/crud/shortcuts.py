@@ -8,23 +8,16 @@ from starlette.status import (
     HTTP_412_PRECONDITION_FAILED,
     HTTP_400_BAD_REQUEST
 )
+from sqlalchemy.orm import Session
 
 from .user import get_user, get_user_by_email
 from .product import get_product
 from .image import get_image
-from ..db.mongodb import AsyncIOMotorClient
 
 
-async def check_free_username_and_email(
-        conn: AsyncIOMotorClient, username: Optional[str] = None, email: Optional[EmailStr] = None
+async def check_free_email(
+        conn: Session, email: Optional[EmailStr] = None
 ):
-    if username:
-        user_by_username = await get_user(conn, username)
-        if user_by_username:
-            raise HTTPException(
-                status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="User with this username already exists",
-            )
     if email:
         user_by_email = await get_user_by_email(conn, email)
         if user_by_email:
@@ -35,7 +28,7 @@ async def check_free_username_and_email(
 
 
 async def check_free_product_code(
-        conn: AsyncIOMotorClient, code: Optional[str] = None
+        conn: Session, code: Optional[str] = None
 ):
 
     if code:
@@ -48,7 +41,7 @@ async def check_free_product_code(
 
 
 async def check_is_product_owner(
-        conn: AsyncIOMotorClient, user_id: Optional[str] = None, product_code: Optional[str] = None, scope: Optional[str] = "update"
+        conn: Session, user_id: Optional[str] = None, product_code: Optional[str] = None, scope: Optional[str] = "update"
 ):
 
     if user_id and product_code:
@@ -59,6 +52,8 @@ async def check_is_product_owner(
                 status_code=HTTP_403_FORBIDDEN,
                 detail=f"You can't {scope} this product"
             )
+
+        return
 
     raise HTTPException(
         status_code=HTTP_400_BAD_REQUEST,
@@ -99,7 +94,7 @@ def check_is_valid_name(name: Optional[str] = None):
 
 
 async def check_is_image_owner(
-        conn: AsyncIOMotorClient, user_id: Optional[str] = None, image_id: Optional[str] = None):
+        conn: Session, user_id: Optional[str] = None, image_id: Optional[str] = None):
 
     if user_id and image_id:
         image = await get_image(conn, image_id)
@@ -109,6 +104,8 @@ async def check_is_image_owner(
                 status_code=HTTP_403_FORBIDDEN,
                 detail=f"You can't remove this image"
             )
+
+        return
 
     raise HTTPException(
         status_code=HTTP_400_BAD_REQUEST,

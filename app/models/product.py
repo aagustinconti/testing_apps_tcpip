@@ -1,7 +1,8 @@
 from typing import Optional
+from sqlalchemy import Column, Integer, String, Float, Text
 
-from .dbmodel import DBModelMixin
 from .rwmodel import RWModel
+from ..db.mysqldb import Base
 
 
 class ProductBase(RWModel):
@@ -14,8 +15,18 @@ class ProductBase(RWModel):
     owner_id: str
 
 
-class ProductInDB(DBModelMixin, ProductBase):
-    pass
+class ProductInDB(Base):
+    __tablename__ = 'products'
+
+    product_code = Column(String(15), primary_key=True,
+                          autoincrement=False, index=True)
+    name = Column(String(255), primary_key=True,
+                  autoincrement=False, index=True)
+    price = Column(Float(2))
+    amount = Column(Integer)
+    image = Column(String(255), nullable=True)
+    description = Column(String(255), nullable=True)
+    owner_id = Column(Integer)
 
 
 class Product(ProductBase):

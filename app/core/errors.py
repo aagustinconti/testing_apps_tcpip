@@ -1,5 +1,4 @@
 from collections.abc import Iterable
-import logging
 
 from fastapi.openapi.constants import REF_PREFIX
 from fastapi.openapi.utils import (
@@ -13,7 +12,6 @@ from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 
 async def http_error_handler(request: Request, exc: HTTPException) -> JSONResponse:
-    logging.info(exc.status_code)
     return JSONResponse({"errors": [exc.detail]}, status_code=exc.status_code)
 
 

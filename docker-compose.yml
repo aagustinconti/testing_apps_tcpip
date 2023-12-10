@@ -1,44 +1,45 @@
 version: "3.1"
 
 services:
-  mongodb:
-    image: mongo
+  mysqldb:
+    image: mysql
     restart: always
+    env_file:
+      - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-    ports:
-      - 27017:27017
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
     volumes:
-      - db:/data/db
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    depends_on:
-      - mongodb
+      - db:/var/lib/mysql
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
-      ME_CONFIG_MONGODB_URL: mongodb://admin:admin@mongodb:27017/?authSource=admin
+      - "3306:3306"
 
   api:
     build:
       dockerfile: ./app/Dockerfile
       context: .
     image: tcp-ip
+    restart: always
     env_file:
       - .env
     environment:
-      MONGO_HOST: mongodb
+      MYSQL_HOST: mysqldb
     depends_on:
-      - mongodb
+      - mysqldb
     ports:
       - "8000:8000"
+
+  ui:
+    build:
+      context: ./ui
+    image: ui-tcp-ip
+    restart: always
+    environment:
+      API_URL: http://api:8000
+      PORT: 80
+    depends_on:
+      - api
+    ports:
+      - "80:80"
 
 volumes:
   db:
