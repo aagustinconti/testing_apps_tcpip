@@ -21,8 +21,6 @@ sudo su
 echo "* 0.0.0.0/0" > /etc/vbox/networks.conf
 ```
 
-
-
 ### Crear las claves públicas y privadas para las conexiones SSH
 
 Creamos nuestra propia clave pública y privada con `ssh-keygen`, procuramos no poner passphrase para que no se la solicite a las VMs a la hora de iniciarlas.
@@ -168,3 +166,45 @@ ssh -i ~/.ssh/vagrant_key vagrant@192.168.100.171
 ```
 
 Si queremos entrar como `root` simplemente cambiamos el usuario a root.
+
+## Problemas
+
+- Despliegue de MongoDB, ningun ejemplo da en el clavo con la versión, no la tienen fijada ni a la versión de Kubernetes ni a la versión de MongoDB y las que se logran desplegar no funciona el comando mongod ni mongo, por ende no puedo crear ni un replicaset y obtener el link para el acceso a la DB.
+  - Probe tanto con minikube como nuestro cluster bare-metal en vagrant. Verisiones 1.17.0, 1.21.5 y 1.26.1 de Kubernetes. Versiones 4.2 , 4.2.6 y 4.4.2 de MongoDB.
+- La carga de imágen del Docker no es tan simple como parece, se necesita usar el DockerHub.
+  - Existen métodos que utilizan aplicaciones extra para buscar en las imágenes creadas en local pero son un bardo.
+- A la hora de usar la API tiene que cargar valores de entorno los cuales los obtiene del .env, por ende la lógica del código para traer el .env no es la misma que para Kubernetes, donde usamos los Secrets o confimaps.
+  - Cambiaría el archivo `config.py`, ya que no se obtendrían las variables de entorno de esa manera y el URL de la DB no sería ese.
+  - Entiendo que los valores declarados en `config.py` son utilizado luego en los demás archivos haciendo una importación de módulos.
+- ¿Por qué en el docler-compose se definen las variables de entorno como contraseñas si tenes el .env?
+
+### Justificación de por qué correr la DB en una VM y mejor deployar la app solamente
+
+[https://cloud.google.com/blog/products/databases/to-run-or-not-to-run-a-database-on-kubernetes-what-to-consider](https://cloud.google.com/blog/products/databases/to-run-or-not-to-run-a-database-on-kubernetes-what-to-consider)
+
+- No tiene características "amigables" con kubernetes -> Tiene un operador (MongoDB K8s operator)-> La carga de trabajo NO es amigable con Kubernetes (uso en general) -> Es aceptable tener bastante sobrecarga ->  Correr en una VM.
+
+- ¿Como hacemos esto? Instalamos docker en una de las VMs de Vagrant y hacemos el docker-compose del servicio.
+
+## Pruebas
+
+Descargar repositorio:
+
+```sh
+mkdir mongodb-express
+cd mongodb-express
+git clone https://github.com/weechien/mongo-express-k8s.git
+cd mongo-express-k8s
+```
+
+Iniciar Cluster de Minikube:
+
+```sh
+minikube start --kubernetes-version='1.21.5' --memory='4096' --cpus='4' --disk-size='25GB' --vm=true --nodes=1 -p "test-1.21.5"
+```
+
+Iniciar dashboard:
+
+```sh
+minikube dashboard --url
+```
