@@ -1,4 +1,15 @@
 # My own ignored files
+k8s/.backups
+k8s/.vagrant
+
+
+k8s/shared_folder/*
+
+k8s/ansible/configs/*
+!k8s/ansible/configs/*.yml
+!k8s/ansible/configs/*.yaml
+!k8s/ansible/configs/grafana/
+!k8s/ansible/configs/local_sc_rancher/
 
 
 # Byte-compiled / optimized / DLL files
@@ -162,3 +173,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .vscode
+ui/yarn.lock
+ui/package-lock.json

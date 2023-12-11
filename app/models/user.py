@@ -1,22 +1,19 @@
 from typing import Optional
+from pydantic import EmailStr
+from sqlalchemy import Column, Integer, String
 
-from pydantic import EmailStr, AnyUrl
-
-from .dbmodel import DBModelMixin
 from .rwmodel import RWModel
 from ..core.security import generate_salt, get_password_hash, verify_password
+from ..db.mysqldb import Base
 
 
-class UserBase(RWModel):
-    username: str
-    email: EmailStr
-    bio: Optional[str] = ""
-    image: Optional[AnyUrl] = None
+class UserInDB(Base):
+    __tablename__ = 'users'
 
-
-class UserInDB(DBModelMixin, UserBase):
-    salt: str = ""
-    hashed_password: str = ""
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(320), unique=True)
+    salt = Column(String(128))
+    hashed_password = Column(String(128))
 
     def check_password(self, password: str):
         return verify_password(self.salt + password, self.hashed_password)
@@ -26,7 +23,12 @@ class UserInDB(DBModelMixin, UserBase):
         self.hashed_password = get_password_hash(self.salt + password)
 
 
+class UserBase(RWModel):
+    email: EmailStr
+
+
 class User(UserBase):
+    id: int
     token: str
 
 
@@ -40,12 +42,9 @@ class UserInLogin(RWModel):
 
 
 class UserInCreate(UserInLogin):
-    username: str
+    pass
 
 
 class UserInUpdate(RWModel):
-    username: Optional[str] = None
     email: Optional[EmailStr] = None
     password: Optional[str] = None
-    bio: Optional[str] = None
-    image: Optional[AnyUrl] = None

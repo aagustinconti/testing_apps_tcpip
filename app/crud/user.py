@@ -1,46 +1,37 @@
-from ..db.mongodb import AsyncIOMotorClient
 from pydantic import EmailStr
-from bson.objectid import ObjectId
+from sqlalchemy.orm import Session
 
-from ..core.config import database_name, users_collection_name
-from ..models.user import UserInCreate, UserInDB, UserInUpdate
-
-
-async def get_user(conn: AsyncIOMotorClient, username: str) -> UserInDB:
-    row = await conn[users_collection_name].find_one({"username": username})
-    if row:
-        return UserInDB(**row)
+from ..models.user import UserInCreate, UserInDB, UserInDB, UserInUpdate
 
 
-async def get_user_by_email(conn: AsyncIOMotorClient, email: EmailStr) -> UserInDB:
-    row = await conn[users_collection_name].find_one({"email": email})
-    if row:
-        return UserInDB(**row)
+async def get_user(conn: Session, id: int) -> UserInDB | None:
+    return conn.query(UserInDB).filter(UserInDB.id == id).first()
 
 
-async def create_user(conn: AsyncIOMotorClient, user: UserInCreate) -> UserInDB:
-    dbuser = UserInDB(**user.model_dump())
+async def get_user_by_email(conn: Session, email: EmailStr) -> UserInDB | None:
+    return conn.query(UserInDB).filter(UserInDB.email == email).first()
+
+
+async def create_user(conn: Session, user: UserInCreate) -> UserInDB:
+
+    dbuser = UserInDB(email=user.email)
     dbuser.change_password(user.password)
 
-    await conn[users_collection_name].insert_one(dbuser.model_dump())
-
-    dbuser.created_at = ObjectId(dbuser.id).generation_time
-    dbuser.updated_at = ObjectId(dbuser.id).generation_time
+    conn.add(dbuser)
+    conn.commit()
 
     return dbuser
 
 
-async def update_user(conn: AsyncIOMotorClient, username: str, user: UserInUpdate) -> UserInDB:
-    dbuser = await get_user(conn, username)
+async def update_user(conn: Session, id: int, user: UserInUpdate) -> UserInDB:
+    dbuser = await get_user(conn, id)
 
-    dbuser.username = user.username or dbuser.username
     dbuser.email = user.email or dbuser.email
-    dbuser.bio = user.bio or dbuser.bio
-    dbuser.image = user.image or dbuser.image
+
     if user.password:
         dbuser.change_password(user.password)
 
-    updated_at = await conn[database_name][users_collection_name]\
-        .update_one({"username": dbuser.username}, {'$set': dbuser.model_dump()})
-    dbuser.updated_at = updated_at
+    conn.commit()
+    conn.refresh(dbuser)
+
     return dbuser

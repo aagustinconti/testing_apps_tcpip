@@ -7,7 +7,6 @@ import logging
 from .api.api_v1.api import router as api_router
 from .core.config import API_V1_STR, PROJECT_NAME, ALLOWED_HOSTS
 from app.core.errors import http_422_error_handler, http_error_handler
-from .db.mongodb_utils import close_mongo_connection, connect_to_mongo
 
 logging.basicConfig(
     level=logging.INFO,  # Set the desired log level
@@ -26,9 +25,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.add_event_handler("startup", connect_to_mongo)
-app.add_event_handler("shutdown", close_mongo_connection)
 
 app.add_exception_handler(HTTPException, http_error_handler)
 app.add_exception_handler(
