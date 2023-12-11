@@ -1,33 +1,32 @@
 from datetime import datetime
 import logging
-from ..db.mongodb import AsyncIOMotorClient
-from bson.objectid import ObjectId
+from sqlalchemy.orm import Session
+from base64 import b64encode
 
-from ..core.config import database_name, images_collection_name
-from ..models.image import ImageInCreate, ImageInDB
-
-
-async def get_image(conn: AsyncIOMotorClient, id: str):
-    row = await conn[database_name][images_collection_name].find_one({'_id': ObjectId(id)})
-    if row:
-        return ImageInDB(**row, id=str(row['_id']))
+from ..models.image import ImageBase, ImageInCreate, ImageInDB
 
 
-async def get_images_by_owner(conn: AsyncIOMotorClient, owner_id: str):
-    cursor = conn[database_name][images_collection_name].find(
-        {"owner_id": owner_id})
-    images = await cursor.to_list(length=None)
-    return [ImageInDB(**image, id=str(image['_id'])) for image in images]
+async def get_image(conn: Session, id: str):
+    return conn.query(ImageInDB).filter(ImageInDB.id == id).first()
 
 
-async def create_image(conn: AsyncIOMotorClient, new_image: ImageInCreate, owner_id: str):
+async def get_images_by_owner(conn: Session, owner_id: str):
+    return conn.query(ImageInDB).filter(ImageInDB.owner_id == owner_id).all()
+
+
+async def create_image(conn: Session, new_image: ImageInCreate, owner_id: str):
 
     new_image_db = ImageInDB(
-        image_base64=new_image.image_base64, owner_id=owner_id)
+        image_base64=new_image.image_base64.encode(), owner_id=owner_id)
 
-    result = await conn[database_name][images_collection_name].insert_one(new_image_db.model_dump())
-    return str(result.inserted_id)
+    conn.add(new_image_db)
+    conn.commit()
+    conn.refresh(new_image_db)
+
+    return new_image_db.id
 
 
-async def remove_image(conn: AsyncIOMotorClient, id: str):
-    await conn[database_name][images_collection_name].delete_one({'_id': id})
+async def remove_image(conn: Session, id: str):
+    db_image = await get_image(conn, id)
+    conn.delete(db_image)
+    conn.commit()
