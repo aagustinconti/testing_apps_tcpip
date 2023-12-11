@@ -522,6 +522,94 @@ docker images
   docker push <dockerhub-user>/<nombre-repositorio-dockerhub>
   ```
 
+## Monitoreo de los recursos utilizados
+
+### Grafana y Prometheus
+
+#### Instalación
+
+1. Descargar repositorio del operador:
+
+```
+git clone https://github.com/prometheus-operator/kube-prometheus.git
+cd kube-prometheus
+```
+
+2. Instalar el operador:
+
+```
+kubectl apply --server-side -f manifests/setup
+```
+
+3. Instalar todos los elementos:
+
+```
+kubectl apply -f manifests 
+```
+
+4. Checkeamos que se hayan levantado todos los servicios, replicasets y pods:
+
+```
+kubectl get all -n monitoring
+```
+
+5. Editamos los servicios para poder exponerlos, de ClusterIP a NodePort a todos:
+
+```
+kubectl edit svc grafana -n monitoring
+```
+
+```
+kubectl edit svc prometheus-k8s -n monitoring
+```
+
+```
+kubectl edit svc alertmanager-main -n monitoring
+```
+
+6. Listamos los nodos, buscamos la IP del worker:
+
+```
+kubectl get nodes -o wide
+```
+
+7. Listamos todos los servicios y buscamos el puerto al que se ha expuesto:
+
+```
+kubectl get svc -A
+```
+
+> Checkeamos los puertos `grafana`, `prometheus-k8s` y `alertmanager-main` que tengan "NodePort".
+
+8. Ingresamos a `<ip-nodo-worker>:<puerto-svc>`
+
+#### Ejemplo grafana
+
+![Ejemplo Grafana](img/ejemplo-grafana.png)
+
+> user: `admin`, psw: `admin`
+
+Añadimos de datasource a Prometheus y configuramos un dashboard con algunos datos, por ejemplo, memoria disponible:
+
+![Ejemplo basico prometheus](img/ejemplo-basico-prometheus.png)
+
+![Ejemplo completo prometheus](img/ejemplo-completo-prometheus.png)
+
+#### Levantar la base de datos MySQL en Grafana
+
+Vamos a `Data Sources`, luego `Add Data Sources`, luego elegimos MySQL y colocamos:
+
+- Host URL: `mysql-0.mysql-headless.default.svc.cluster.local:3306`
+- Database name: `<nombre-db>`
+- Username: `root`
+- Password: `root`
+
+Hacemos click en `Save and Test`.
+
+Luego podremos crear un dashboard donde traigamos como tabla, por ejemplo, los datos de la tabla:
+
+![Ejemplo grafana DB](img/ejemplo-grafana-db.png)
+
 ## Referencias
 
 - [dns-utils](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/)
@@ -533,3 +621,5 @@ docker images
 - [Repositorio GitHub: kunchalavikram1427/StatefulSets_demo](https://github.com/kunchalavikram1427/StatefulSets_demo/tree/master/python_todo_app/kubernetes)
 
 - [Kubernetes: Run a Replicated Stateful Application](https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/)
+
+- [Prometheus and Grafana on Kubernetes](https://blog.opstree.com/2022/10/04/prometheus-and-grafana-on-kubernetes/)
