@@ -1,4 +1,4 @@
-# Cómo levantar un Clúster de Kubernetes con Vagrant
+# Cómo levantar un Clúster y desplegar nuestra aplicación
 
 ## Vagrant
 
@@ -167,26 +167,7 @@ ssh -i ~/.ssh/vagrant_key vagrant@192.168.100.171
 
 Si queremos entrar como `root` simplemente cambiamos el usuario a root.
 
-## Problemas
-
-- Despliegue de MongoDB, ningun ejemplo da en el clavo con la versión, no la tienen fijada ni a la versión de Kubernetes ni a la versión de MongoDB y las que se logran desplegar no funciona el comando mongod ni mongo, por ende no puedo crear ni un replicaset y obtener el link para el acceso a la DB.
-  - Probe tanto con minikube como nuestro cluster bare-metal en vagrant. Verisiones 1.17.0, 1.21.5 y 1.26.1 de Kubernetes. Versiones 4.2 , 4.2.6 y 4.4.2 de MongoDB.
-- La carga de imágen del Docker no es tan simple como parece, se necesita usar el DockerHub.
-  - Existen métodos que utilizan aplicaciones extra para buscar en las imágenes creadas en local pero son un bardo.
-- A la hora de usar la API tiene que cargar valores de entorno los cuales los obtiene del .env, por ende la lógica del código para traer el .env no es la misma que para Kubernetes, donde usamos los Secrets o confimaps.
-  - Cambiaría el archivo `config.py`, ya que no se obtendrían las variables de entorno de esa manera y el URL de la DB no sería ese.
-  - Entiendo que los valores declarados en `config.py` son utilizado luego en los demás archivos haciendo una importación de módulos.
-- ¿Por qué en el docler-compose se definen las variables de entorno como contraseñas si tenes el .env?
-
-### Justificación de por qué correr la DB en una VM y mejor deployar la app solamente
-
-[https://cloud.google.com/blog/products/databases/to-run-or-not-to-run-a-database-on-kubernetes-what-to-consider](https://cloud.google.com/blog/products/databases/to-run-or-not-to-run-a-database-on-kubernetes-what-to-consider)
-
-- No tiene características "amigables" con kubernetes -> Tiene un operador (MongoDB K8s operator)-> La carga de trabajo NO es amigable con Kubernetes (uso en general) -> Es aceptable tener bastante sobrecarga ->  Correr en una VM.
-
-- ¿Como hacemos esto? Instalamos docker en una de las VMs de Vagrant y hacemos el docker-compose del servicio.
-
-# Minikube
+## Minikube
 
 Se detectaron problemas de DNS en el Cluster de Vagrant, estos son fácilmente verificables generando un pod de test [dns-utils](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/) y aplicando el siguiente comando:
 
@@ -219,15 +200,15 @@ Podemos levantar el Dashboard para una mejor visualización de lo que ocurre con
 minikube dashboard -p test-1.26-2nodes
 ```
 
-## Levantar base de datos MySQL
+### Levantar base de datos MySQL
 
-### ¿Por qué MySQL y no MongoDB u alguna otra?
+#### ¿Por qué MySQL y no MongoDB u alguna otra?
 
 Se hizo la búsqueda de información pertinente para poder hacer una selección adecuada para los requerimientos y en la misma se encontró que entre las bases de datos más utilizadas dentro de los entornos de Kubernetes son MySQL y PostgressSQL y que además, el uso de una base de datos en un entorno de Kuebernetes no es una decisión que debamos tomar a la ligera, debido a que resulta muy complicado el mantenimiento y la misma configuración.
 
 Entendiendo lo anterior, se optó por MySQL como base de datos para el proyecto y la misma se desplegará sobre Kubernetes en una configuración denominada "Statefulset", que permite desplegar nombres de pods y volúmenes persistentes.
 
-### ¿Qué arquitectura elegimos y por qué?
+#### ¿Qué arquitectura elegimos y por qué?
 
 Se probaron 3 diferentes formas para levantar la base de datos en las cuales nos hemos topado con distitos inconvenientes por lo cuales hemos llegado a una decisión final.
 
@@ -299,7 +280,7 @@ Debido a lo nombrado anteriormente es que se optó por una base de datos en una 
 
 ![MySQL Structure](img/mysql-structure.png)
 
-### Manifiestos de Kubernetes de la DB
+#### Manifiestos de Kubernetes de la DB
 
 Aquí se brinda el manifiesto utilizado:
 
@@ -388,7 +369,7 @@ La DB quedará accesible entonces vía el siguiente dominio:
 mysql+pymysql://root:root@mysql-0.mysql-headless.default.svc.cluster.local:3306/api
 ```
 
-## Backend - Desplegar la API
+### Backend - Desplegar la API
 
 La API debe ser accesible por fuera con el uso de un servicio tipo NodePort y a su vez debe poder acceder a la DB mediante el uso de DNS, pegandole al pod correspondiente (o al servicio, da igual porque tenemos un único pod) de la DB.
 
@@ -451,7 +432,7 @@ La gráfica quedaría de la siguiente manera:
 
 ![Diagram API](img/diagram-api.png)
 
-## Frontend - Desplegar la UI
+### Frontend - Desplegar la UI
 
 La UI debe poder comunicarse con la API y y a su vez debe ser accesible desde el puerto 80 de la IP del nodo así los usuarios pueden acceder a la misma. Para lo anterior se creó otro servicio tipo NodePort y a su vez se le pasaron los datos importantes para que se pueda conectar a la API, como el host: `mysql-0.mysql-headless.default.svc.cluster.local`, la clave, el usuario y la DB.
 
@@ -514,9 +495,7 @@ El diagrama queda como sigue:
 
 ![Diagrama UI](img/diagrama-ui.png)
 
-
-## ¿Como paso la Dockerfile a DockerHub?
-
+### ¿Como paso la Dockerfile a DockerHub?
 
 1. Crearse una cuenta en [DockerHub](https://hub.docker.com/u/aagustinconti)
 
