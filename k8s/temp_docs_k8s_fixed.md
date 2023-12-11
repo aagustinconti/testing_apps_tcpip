@@ -504,8 +504,6 @@ spec:
             value: 'http://api:8000'
           - name: PORT
             value: '80'
-          - name: IMAGE_URL
-            value: 'http://<worker-node-ip>:31000'
 
 ```
 
@@ -523,9 +521,7 @@ kubectl delete -f <nombre-manifiesto-ui>.yaml
 
 Nuevamente se utilizó Docker para crear la imágen y subirla al DockerHub para que sea accesible por Kubernetes a través de `aagustinconti/ui-node-products:latest`.
 
-Por otro lado debemos observar algo clave, entre los valores de las variables de entorno que le suministramos, encontramos que encuentra perfectamente a la api mediante el servicio "api" en el puerto 8000 (utilizando la resolución de DNS), mientras que el otro parámetro es "IMAGE_URL" nos debería llamar la atención, ya que debemos configurar a mano la IP del nodo, lo que no es del todo conveniente porque al no usar resolución por DNS, si se cae el nodo puede aparecer con otra IP y no será más accesible.
-
-Lo anterior se da debido a un inconveniente de programación de la UI, donde esta se divide en dos partes, Server y Client, el cliente está en la máquina del usuario que accede a la página web mientras que el Server es el pod que procesa todas las peticiones. En este caso, las imágenes deberían ser peticionadas al pod de UI desde ahí, el pod debería pedirle a la API las imágenes ya que el POD de la UI sí vé a la API internamente, pero sucede que no fue posible esa configuración, por lo que el cliente accedería a las imágenes de la API mediante el uso de la IP del servicio NodePort. Entendemos que no es conveniente, pero hasta la resolución de este inconveniente mantendremos en funcionamiento de esta manera.
+Por otro lado debemos observar algo clave, entre los valores de las variables de entorno que le suministramos, encontramos que encuentra perfectamente a la api mediante el servicio "api" en el puerto 8000 (utilizando la resolución de DNS).
 
 El diagrama queda como sigue:
 

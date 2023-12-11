@@ -119,7 +119,10 @@ export async function getServerSideProps(context: any) {
     }
     catch {
         return {
-            props: {},
+            redirect: {
+                destination: '/auth/login',
+                permanent: false,
+            },
         }
     }
 

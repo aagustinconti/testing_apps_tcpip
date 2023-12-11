@@ -1,5 +1,5 @@
-import { API_URL, IMAGE_URL, TOKEN_NAME } from "@/utils/constants";
-import { serialize, parse } from "cookie";
+import { API_URL, TOKEN_NAME } from "@/utils/constants";
+import { parse } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function addImage(req: NextApiRequest, res: NextApiResponse) {
@@ -32,7 +32,7 @@ export default async function addImage(req: NextApiRequest, res: NextApiResponse
         const data = await response.json()
 
         if (response.status === 201) {
-            return res.status(response.status).json(`${IMAGE_URL}/image/get/?id=${data}`)
+            return res.status(response.status).json(`/api/image/get/${data}`)
         }
 
         return res.status(response.status).json(data)
