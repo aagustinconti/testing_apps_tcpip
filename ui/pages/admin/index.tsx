@@ -9,6 +9,7 @@ import { Grid, Group, Button } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import ProductDataModal from "@/components/ProductDataModal";
+import { NextPageContext } from "next";
 
 
 export default function HomePage(props: { logged: boolean }) {
@@ -100,34 +101,28 @@ export default function HomePage(props: { logged: boolean }) {
     );
 }
 
-export async function getServerSideProps(context: any) {
+export async function getServerSideProps(context: NextPageContext) {
 
     try {
         const { req } = context;
 
-        const token = cookie.parse((req && req.headers.cookie) || null)[TOKEN_NAME];
+        const token = cookie.parse((req && req.headers.cookie) || '')[TOKEN_NAME];
 
-        if (token == null) {
+        if (token != undefined) {
             return {
-                redirect: {
-                    destination: '/auth/login',
-                    permanent: false,
-                },
+                props: { logged: true },
             }
         }
 
     }
-    catch {
-        return {
-            redirect: {
-                destination: '/auth/login',
-                permanent: false,
-            },
-        }
+    catch (e) {
+        console.log(e)
     }
 
     return {
-        props: { logged: true },
+        redirect: {
+            destination: '/auth/login',
+            permanent: false,
+        },
     }
-
 }
