@@ -39,6 +39,3 @@ spec:
             value: 'http://api:8000'
           - name: PORT
             value: '80'
-          - name: IMAGE_URL
-            value: 'http://192.168.39.194:31000'
-          #  value: 'http://<external-ip>:<external-port>'
