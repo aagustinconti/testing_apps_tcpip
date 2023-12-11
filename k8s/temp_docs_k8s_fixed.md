@@ -363,6 +363,18 @@ spec:
             storage: 1Gi
 ```
 
+Desplegar:
+
+```sh
+kubectl apply -f <nombre-manifiesto-db>.yaml
+```
+
+Eliminar:
+
+```sh
+kubectl delete -f <nombre-manifiesto-db>.yaml
+```
+
 La DB quedará accesible entonces vía el siguiente dominio:
 
 ```txt
@@ -424,6 +436,18 @@ spec:
             value: 'mysql+pymysql://root:root@mysql-0.mysql-headless.default.svc.cluster.local:3306/todo'
 ```
 
+Desplegar:
+
+```sh
+kubectl apply -f <nombre-manifiesto-api>.yaml
+```
+
+Eliminar:
+
+```sh
+kubectl delete -f <nombre-manifiesto-api>.yaml
+```
+
 Como dato a tener en cuenta, la API estará disponible en el puerto 31000 de la IP del nodo worker. Internamente el container tendrá expuesto el puerto 8000, el cual estará apuntado por el servicio tipo NodePort para poder exponerlo al 31000, justamente.
 
 Otro dato importante es que se tuvo que dockerizar la API y subir la imagen al DockerHub para que Kubernetes la pueda descargar, como se ve, esta está disponible en `aagustinconti/fast-api-products:latest`.
@@ -483,6 +507,18 @@ spec:
           - name: IMAGE_URL
             value: 'http://<worker-node-ip>:31000'
 
+```
+
+Desplegar:
+
+```sh
+kubectl apply -f <nombre-manifiesto-ui>.yaml
+```
+
+Eliminar:
+
+```sh
+kubectl delete -f <nombre-manifiesto-ui>.yaml
 ```
 
 Nuevamente se utilizó Docker para crear la imágen y subirla al DockerHub para que sea accesible por Kubernetes a través de `aagustinconti/ui-node-products:latest`.
