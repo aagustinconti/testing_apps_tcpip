@@ -514,6 +514,35 @@ El diagrama queda como sigue:
 
 ![Diagrama UI](img/diagrama-ui.png)
 
+
+## ¿Como paso la Dockerfile a DockerHub?
+
+
+1. Crearse una cuenta en [DockerHub](https://hub.docker.com/u/aagustinconti)
+
+2. Crear un repositorio público
+
+![Dockerhub](img/dockerhub.png)
+
+3. Buildear la imágen en local
+
+```
+docker build -f ./app/Dockerfile .
+```
+
+4. Checkeamos la creación de la imágen
+
+```
+docker images
+```
+
+5. Aplicar el siguiente comando
+
+  ```
+  docker tag <nombre-imagen> <dockerhub-user>/<nombre-imagen>
+  docker push <dockerhub-user>/<nombre-repositorio-dockerhub>
+  ```
+
 ## Referencias
 
 - [dns-utils](https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/)
