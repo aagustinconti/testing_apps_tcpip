@@ -1,0 +1,87 @@
+# $ echo -n "root" | base64
+# cm9vdA==
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-headless
+spec:
+  clusterIP: None
+  selector:
+    app: db
+  ports:
+    - name: tcp
+      protocol: TCP
+      port: 3306
+---
+apiVersion: v1
+kind: Secret
+metadata: 
+    name: mysecret
+type: Opaque
+data:
+   ROOT_PASSWORD: cm9vdA==
+---
+# echo -n "mysql+pymysql://root:root@mysql-0.mysql-headless.default.svc.cluster.local:3306/api" | base64
+apiVersion: v1
+kind: Secret
+metadata: 
+    name: database-uri-secret
+type: Opaque
+data:
+   DATABASE_URI: bXlzcWwrcHlteXNxbDovL3Jvb3Q6cm9vdEBteXNxbC0wLm15c3FsLWhlYWRsZXNzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWw6MzMwNi9hcGk= 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS api;
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  serviceName: mysql-headless
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom: 
+               secretKeyRef: 
+                key: ROOT_PASSWORD
+                name: mysecret
+          volumeMounts:
+            - name: mysql-initdb
+              mountPath: /docker-entrypoint-initdb.d
+            - name: data
+              mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+
