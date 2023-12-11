@@ -24,7 +24,7 @@ async function loginHandler(req: NextApiRequest, res: NextApiResponse) {
                 'Set-Cookie',
                 serialize(TOKEN_NAME, data.access_token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
+                    //secure: process.env.NODE_ENV === "production",
                     sameSite: "lax",
                     maxAge: 1000 * 60 * 60 * 24 * 30,
                     path: "/",

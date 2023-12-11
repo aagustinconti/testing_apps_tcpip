@@ -59,7 +59,7 @@ export default function AuthenticationForm(props: PaperProps) {
             return;
         }
 
-        router.push("/admin");
+        router.reload();
     }
 
     return (
@@ -112,9 +112,9 @@ export async function getServerSideProps(context: any) {
     try {
         const { req } = context;
 
-        const token = cookie.parse((req && req.headers.cookie) || null)[TOKEN_NAME];
+        const token = cookie.parse((req && req.headers.cookie) || '')[TOKEN_NAME];
 
-        if (token != null) {
+        if (token != undefined) {
             return {
                 redirect: {
                     destination: '/admin',
@@ -124,10 +124,8 @@ export async function getServerSideProps(context: any) {
         }
 
     }
-    catch {
-        return {
-            props: {},
-        }
+    catch (e) {
+        console.log(e)
     }
 
     return {
