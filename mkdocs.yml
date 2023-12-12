@@ -82,6 +82,11 @@ markdown_extensions:
   - pymdownx.mark
   - attr_list
 
+
+plugins:
+  - search
+  - pdf-export
+
 # Copyright footer
 copyright: |
   &copy; 2023 <a href="https://www.ing.unrc.edu.ar/inicio.php"  target="_blank" rel="noopener">Universidad Nacional de Río cuarto | Facultad de Ingeniería</a>
