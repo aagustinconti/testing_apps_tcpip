@@ -3,15 +3,15 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 50 },
-    { duration: '2m', target: 100 },
-    { duration: '1m', target: 1000 },
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
   ],
 };
 
 // Tokens para dos usuarios distintos
-const token1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhZ3VzdGlubkBnbWFpbC5jb20iLCJleHAiOjE3MDI5MjgzOTd9.VveUVEFxY8E1fT20h-yUxEj46rAzZugdpTW1XpuksYU';  // aagustinn@gmail.com
-const token2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhZ3VzdGlubkBnbWFpbC5jb20iLCJleHAiOjE3MDI5MjgzOTd9.VveUVEFxY8E1fT20h-yUxEj46rAzZugdpTW1XpuksYU';  // aagustinn@gmail.com
+const token1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIxQGV4YW1wbGUuY29tIiwiZXhwIjoxNzAzMDM4MDg1fQ.3me0mtW3kqdf8lHOd8iRk_XKQZ9yRFY-EP7klH6llM4';  // aagustinn@gmail.com
+const token2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXIyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzAzMDM4NTgxfQ.fCpxXllcC6E13j2nWZMXBbfxDNXQSHVgbLXXOrje2_I';  // aagustinn@gmail.com
 
 export default function () {
   // Alternancia entre usuarios

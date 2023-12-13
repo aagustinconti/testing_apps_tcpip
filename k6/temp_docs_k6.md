@@ -1,8 +1,20 @@
 # k6
 
-## Hacer un test de cargar simple
+## ¿Qué es k6?
 
-### Descarga de dependencias
+k6 es una herramienta de código abierto destinada a realizar pruebas de carga y rendimiento en aplicaciones y servicios web. Utilizando JavaScript/ES6 para escribir scripts de prueba, k6 destaca por su sencilla sintaxis y soporte para protocolos como HTTP/1.1, HTTP/2 y WebSockets. Diseñado para ejecutarse en la nube y ser fácilmente integrado en flujos de trabajo de CI/CD, k6 proporciona informes detallados y métricas para evaluar el rendimiento de las aplicaciones bajo diversas condiciones de carga. Su flexibilidad y extensibilidad lo convierten en una herramienta valiosa para evaluar y mejorar la escalabilidad de sistemas web.
+
+Entonces, k6 simplifica la realización de pruebas de rendimiento al ofrecer una solución basada en JavaScript con características como integración en la nube, generación de informes detallados y soporte para varios protocolos, proporcionando a los equipos de desarrollo la capacidad de evaluar y optimizar el rendimiento de sus aplicaciones de manera efectiva.
+
+Gracias a ella pudimos plantear pruebas de stress locales hacia diferentes host y endpoints de nuestra api para poder verificar el cumplimiento de los requerimientos acordados con el cliente.
+
+## K6 junto con Prometheus y Grafana
+
+La visualización de datos a través de Grafana en conjunto con Prometheus ofrece una visión integral y en tiempo real del rendimiento del cluster que hospeda la aplicación. Al integrar estadísticas proporcionadas por k6 con los datos de consumo de recursos obtenidos mediante Prometheus, los equipos de desarrollo y operaciones pueden identificar patrones y correlaciones significativas. Esto permite una comprensión profunda de cómo las pruebas de carga impactan los recursos del cluster y cómo estos afectan directamente al rendimiento de la aplicación en producción. Grafana, con sus capacidades de visualización altamente personalizables, proporciona paneles intuitivos y gráficos dinámicos que facilitan la identificación de tendencias, cuellos de botella y áreas de mejora, permitiendo una toma de decisiones informada para optimizar la escalabilidad y la eficiencia del sistema.
+
+La combinación de k6, Prometheus y Grafana proporciona una sinergia poderosa al permitir que los equipos monitoreen y analicen simultáneamente el rendimiento de las pruebas de carga y el comportamiento del cluster en producción. Esta integración facilita la identificación proactiva de posibles problemas y la optimización continua del rendimiento, respaldando la toma de decisiones basada en datos con una representación visual clara y detallada de la salud y eficiencia del sistema en tiempo real.
+
+## Instalación de k6
 
 En Debian/Ubuntu, seguimos los pasos de la [página de K6](https://k6.io/docs/get-started/installation/).
 
@@ -16,372 +28,427 @@ sudo apt-get update
 sudo apt-get install k6
 ```
 
-### Creación de archivo del test de carga
+### Correr el test de carga
 
-Dentro de nuestro directorio de trabajo creamos un archivo `simple.js` (podría llamarse de cualquier forma) y dentro de él escribimos lo siguiente:
+Para correr cualquier test lo único que debemos hacer es poner en consola lo siguiente:
 
-``` javascript
+```sh
+# on k6 dir
+k6 run test-api/<nombre-del-test>.js
+```
+
+## Pruebas realizadas
+
+Las pruebas se centraron en cumplir con los requisitos de resistencia del cliente, priorizando la capacidad de la interfaz de usuario para soportar más de 5000 usuarios simultáneos en su página principal. Además, se llevaron a cabo pruebas adicionales, como la creación masiva de usuarios y productos para evaluar la robustez de la API y la base de datos. Otra prueba se centró en medir el consumo de red al recuperar datos en formato base64 de imágenes completas desde la base de datos. Por último, se evaluó el rendimiento del procesamiento de la API, incluyendo pruebas de carga en el proceso de inicio de sesión que involucra tokens y contraseñas encriptadas con BCrypt. En todos los escenarios, se monitorearon detenidamente la CPU, la RAM, la lectura/escritura del disco y el consumo de red para obtener una visión completa del rendimiento del sistema.
+
+### Test 1: UI
+
+Archivo de configuración de K6 utilizado:
+
+```js
 import http from 'k6/http';
 import { sleep } from 'k6';
 
+export const options = {
+  stages: [
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
+  ],
+};
+
 export default function () {
-  http.get('https://aagustinconti.github.io/testing_apps_tcpip/');
+  http.get('http://192.168.39.203:30001/');
   sleep(1);
+}
 ```
 
-Lo importante acá es entender que no correremos nuestro test sobre javascript, ya que es extremadamente ineficiente y no podría manejar miles y miles de peticiones. Quien puede manejar todo esto es `GO`.
-
-Simplemente escribimos en este lenguaje porque es 'más fácil de entender', luego K6 será el encargado de convertir ese archivo `.js` a un archivo `GO`.
-
-### Correr el test de carga
-
-Para correr el test lo único que debemos hacer es poner en consola lo siguiente:
+Resultado de consola de k6:
 
 ```sh
-# on working dir
-k6 run simple.js
+     data_received..................: 141 MB 1.1 MB/s
+     data_sent......................: 1.3 MB 10 kB/s
+     http_req_blocked...............: avg=74.96ms  min=951ns  med=5.29µs  max=7.3s   p(90)=529.72µs p(95)=5.64ms  
+     http_req_connecting............: avg=42.82ms  min=0s     med=0s      max=7.3s   p(90)=357.86µs p(95)=447.3µs 
+     http_req_duration..............: avg=25.35s   min=8.63ms med=23.68s  max=1m0s   p(90)=46.43s   p(95)=49.46s  
+       { expected_response:true }...: avg=24.8s    min=8.63ms med=23.67s  max=59.98s p(90)=44.26s   p(95)=47.46s  
+     http_req_failed................: 1.57%  ✓ 227        ✗ 14208 
+     http_req_receiving.............: avg=84.93µs  min=0s     med=80.47µs max=4.41ms p(90)=113.12µs p(95)=127.36µs
+     http_req_sending...............: avg=430.38ms min=5.32µs med=21.77µs max=9.55s  p(90)=83.96µs  p(95)=4.17s   
+     http_req_tls_handshaking.......: avg=0s       min=0s     med=0s      max=0s     p(90)=0s       p(95)=0s      
+     http_req_waiting...............: avg=24.92s   min=8.44ms med=23.68s  max=1m0s   p(90)=41.57s   p(95)=49.46s  
+     http_reqs......................: 14435  110.617989/s
+     iteration_duration.............: avg=26.4s    min=1s     med=24.69s  max=1m1s   p(90)=47.43s   p(95)=50.46s  
+     iterations.....................: 14435  110.617989/s
+     vus............................: 744    min=42       max=4984
+     vus_max........................: 5000   min=5000     max=5000
+
+
+running (2m10.5s), 0000/5000 VUs, 14435 complete and 0 interrupted iterations
+default ✓ [======================================] 0000/5000 VUs  1m45s
 ```
 
-### Observamos las métricas obtenidas
+Resultado de Grafana:
 
-```sh
-# En nuestro caso le apuntamos a la página de nuestra documentación 'https://aagustinconti.github.io/testing_apps_tcpip/'
+![CPU usage](img/test1-cpu.png)
+![Network traffic](img/test1-network.png)
+![Memory usage](img/test1-memory.png)
+![Disk usage](img/test1-disk-usage.png)
 
-> k6 run simple.js
+### Test 2: User login
 
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
-  / __________ \  |__| \__\ \_____/ .io
-
-  execution: local
-     script: simple.js
-     output: -
-
-  scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
-           * default: 1 iterations for each of 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
-
-
-     data_received..................: 25 kB 13 kB/s
-     data_sent......................: 707 B 349 B/s
-     http_req_blocked...............: avg=372.61ms min=372.61ms med=372.61ms max=372.61ms p(90)=372.61ms p(95)=372.61ms
-     http_req_connecting............: avg=100.67ms min=100.67ms med=100.67ms max=100.67ms p(90)=100.67ms p(95)=100.67ms
-     http_req_duration..............: avg=650.6ms  min=650.6ms  med=650.6ms  max=650.6ms  p(90)=650.6ms  p(95)=650.6ms 
-       { expected_response:true }...: avg=650.6ms  min=650.6ms  med=650.6ms  max=650.6ms  p(90)=650.6ms  p(95)=650.6ms 
-     http_req_failed................: 0.00% ✓ 0        ✗ 1  
-     http_req_receiving.............: avg=248.39µs min=248.39µs med=248.39µs max=248.39µs p(90)=248.39µs p(95)=248.39µs
-     http_req_sending...............: avg=379.37µs min=379.37µs med=379.37µs max=379.37µs p(90)=379.37µs p(95)=379.37µs
-     http_req_tls_handshaking.......: avg=67.17ms  min=67.17ms  med=67.17ms  max=67.17ms  p(90)=67.17ms  p(95)=67.17ms 
-     http_req_waiting...............: avg=649.97ms min=649.97ms med=649.97ms max=649.97ms p(90)=649.97ms p(95)=649.97ms
-     http_reqs......................: 1     0.493935/s
-     iteration_duration.............: avg=2.02s    min=2.02s    med=2.02s    max=2.02s    p(90)=2.02s    p(95)=2.02s   
-     iterations.....................: 1     0.493935/s
-     vus............................: 1     min=1      max=1
-     vus_max........................: 1     min=1      max=1
-
-
-running (00m02.0s), 0/1 VUs, 1 complete and 0 interrupted iterations
-default ✓ [======================================] 1 VUs  00m02.0s/10m0s  1/1 iters, 1 per VU
-```
-
-Lo que acabamos de hacer es simular que tenemos **un solo usuario virtual**.
-
-Si observamos las métricas tentremos un panorama general del rendimiento, y estas son solo algunas, podremos agregar más.
-
-Podremos utilizar las métricas que ya nos provee K6, pero también podremos crear métricas [nosotros mismos](https://k6.io/docs/using-k6/metrics/create-custom-metrics/).
-
-## Simular más de un usuario virtual
-
-Podemos indicar el número de usuarios que querramos probar de la siguiente manera:
-
-```sh
-k6 run --vus 10 --duration 30s simple.js
-```
-
-Como vemos agregamos dos parámetros más a la ejecución:
-
-- `vus`: Indica el número de usuarios virtuales que queremos simular.
-- `duration`: Indica la duracióon del test.
-
-Veamos el output:
-
-```sh
-> k6 run --vus 10 --duration 30s simple.js
-
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
-  / __________ \  |__| \__\ \_____/ .io
-
-  execution: local
-     script: simple.js
-     output: -
-
-  scenarios: (100.00%) 1 scenario, 10 max VUs, 1m0s max duration (incl. graceful stop):
-           * default: 10 looping VUs for 30s (gracefulStop: 30s)
-
-
-     data_received..................: 5.8 MB 190 kB/s
-     data_sent......................: 32 kB  1.0 kB/s
-     http_req_blocked...............: avg=8.15ms   min=285ns    med=1.14µs   max=231.92ms p(90)=1.78µs   p(95)=2.37µs  
-     http_req_connecting............: avg=798.19µs min=0s       med=0s       max=22.95ms  p(90)=0s       p(95)=0s      
-     http_req_duration..............: avg=75.69ms  min=28.22ms  med=35.04ms  max=1.01s    p(90)=70.44ms  p(95)=87.79ms 
-       { expected_response:true }...: avg=75.69ms  min=28.22ms  med=35.04ms  max=1.01s    p(90)=70.44ms  p(95)=87.79ms 
-     http_req_failed................: 0.00%  ✓ 0        ✗ 279 
-     http_req_receiving.............: avg=29.47ms  min=234.26µs med=12.93ms  max=407.56ms p(90)=46.76ms  p(95)=65.02ms 
-     http_req_sending...............: avg=137.36µs min=32.76µs  med=131.43µs max=649.49µs p(90)=171.43µs p(95)=200.64µs
-     http_req_tls_handshaking.......: avg=3.19ms   min=0s       med=0s       max=93.61ms  p(90)=0s       p(95)=0s      
-     http_req_waiting...............: avg=46.08ms  min=18.49ms  med=21.39ms  max=913.48ms p(90)=33.55ms  p(95)=64.56ms 
-     http_reqs......................: 279    9.073319/s
-     iteration_duration.............: avg=1.08s    min=1.02s    med=1.03s    max=2.24s    p(90)=1.07s    p(95)=1.08s   
-     iterations.....................: 279    9.073319/s
-     vus............................: 10     min=10     max=10
-     vus_max........................: 10     min=10     max=10
-
-
-running (0m30.7s), 00/10 VUs, 279 complete and 0 interrupted iterations
-default ✓ [======================================] 10 VUs  30s
-```
-
-Una sola instancia de k6 puede simular desde 30 a 40 mil usuarios simultáneos.
-
-Con 30 mil usuarios concurrentes hacemos aproximadamente 300 mil request por segundo (RPS) o de 6 a 12 millones de request por minuto.
-
-Si queremos simular más usuarios, deberemos hacer "distributed testing" o testing distribuido, es decir, podemos usar un Cluster de Kubernetes para levantar varios pods con varias instancias de K6 y así incrementar el número a un numero realmente grande.
-
-Para tener una idea, la simulación de un virtual user requiere de 1 a 5 MB de RAM, por lo que para simular 1000 usuarios requerimos de 1 a 5 GB de RAM.
-
-La CPU no es una gran limitación a considerar ya que está bastante optimizado.
-
-## Opciones de K6
-
-Crearemos otro archivo `.js` pero en este caso especificaremos ciertos parámetros u opciones dentro del mismo archivo. Entocnes, creamos el archivo `options.js`.
-
-Dentro del mismo archivo observaremos que los parámetros que antes pasábamos por consola ahora los pasamos directamente como constantes dentro del mismo:
+Archivo de configuración de K6 utilizado:
 
 ```js
-export const options = {
-
-  vus: 100,
-  duration: '30s',
-
-};
-```
-
-Ahora para ejectuar nuestro test directamente hacemos:
-
-```sh
-k6 run options.js
-```
-
-Y deberíamos obtener lo siguiente:
-
-```sh
-
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
-  / __________ \  |__| \__\ \_____/ .io
-
-  execution: local
-     script: options.js
-     output: -
-
-  scenarios: (100.00%) 1 scenario, 100 max VUs, 1m0s max duration (incl. graceful stop):
-           * default: 100 looping VUs for 30s (gracefulStop: 30s)
-
-
-     data_received..................: 60 MB  1.9 MB/s
-     data_sent......................: 332 kB 11 kB/s
-     http_req_blocked...............: avg=4.28ms   min=227ns   med=1.2µs    max=143.46ms p(90)=1.81µs   p(95)=2.29µs  
-     http_req_connecting............: avg=1.1ms    min=0s      med=0s       max=42.57ms  p(90)=0s       p(95)=0s      
-     http_req_duration..............: avg=66.49ms  min=22.5ms  med=35.39ms  max=1.31s    p(90)=101.7ms  p(95)=157.63ms
-       { expected_response:true }...: avg=66.49ms  min=22.5ms  med=35.39ms  max=1.31s    p(90)=101.7ms  p(95)=157.63ms
-     http_req_failed................: 0.00%  ✓ 0         ✗ 2846 
-     http_req_receiving.............: avg=24.77ms  min=86.12µs med=12.1ms   max=936.75ms p(90)=62.42ms  p(95)=85.75ms 
-     http_req_sending...............: avg=118.48µs min=21.21µs med=115.26µs max=1.31ms   p(90)=158.15µs p(95)=177.61µs
-     http_req_tls_handshaking.......: avg=3.15ms   min=0s      med=0s       max=116.44ms p(90)=0s       p(95)=0s      
-     http_req_waiting...............: avg=41.6ms   min=18.32ms med=21.54ms  max=949.15ms p(90)=42.2ms   p(95)=76.31ms 
-     http_reqs......................: 2846   91.615347/s
-     iteration_duration.............: avg=1.07s    min=1.02s   med=1.03s    max=2.44s    p(90)=1.1s     p(95)=1.16s   
-     iterations.....................: 2846   91.615347/s
-     vus............................: 3      min=3       max=100
-     vus_max........................: 100    min=100     max=100
-
-
-running (0m31.1s), 000/100 VUs, 2846 complete and 0 interrupted iterations
-default ✓ [======================================] 100 VUs  30s
-```
-
-## Incluir fluctuaciones dentro de los test
-
-Para ser un poco mas acordes a escenarios de la vida real deberemos considerar fluctuaciones en la cantidad de los usuarios y modificando el `.js` podremos icluirlas. Por eso creamos el archivo `stages.js` para contemplar esto:
-
-```js
-import http from "k6/http";
+import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export const options = {
-
   stages: [
-    { duration: "30s", target: 25 },
-    { duration: "1m", target: 50 },
-    { duration: "20s", target: 0 },
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
   ],
-
 };
 
 export default function () {
-  const pages = [
-    "/",
-    "/5-attachments",
-    "/this-does-not-exist/",
-  ]
-  for (const page of pages) {
-    const res = http.get("https://aagustinconti.github.io/testing_apps_tcpip" + page);
+  // Datos del usuario para el login
+  const username = 'aagustin@gmail.com';
+  const password = '12345678';
+
+  // Realizar la solicitud POST para el login del usuario
+  const res = http.post('http://192.168.39.203:31000/auth/login', {
+    grant_type: '',
+    username,
+    password,
+    scope: '',
+    client_id: '',
+    client_secret: '',
+  }, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json',
+    },
+  });
+
+  // Verificar si la respuesta es exitosa (código 2xx)
+  check(res, {
+    'status was 2xx': (r) => r.status >= 200 && r.status < 300,
+  });
+
+  // Introducir una pausa de 1 segundo entre las solicitudes
+  sleep(1);
+}
+```
+
+Resultado de consola de k6:
+
+```sh
+     ✗ status was 2xx
+      ↳  3% — ✓ 407 / ✗ 12074
+
+     checks.........................: 3.26%  ✓ 407       ✗ 12074 
+     data_received..................: 126 kB 993 B/s
+     data_sent......................: 3.5 MB 28 kB/s
+     http_req_blocked...............: avg=513.73ms min=2.45µs   med=1.11ms   max=3.13s    p(90)=3.02s    p(95)=3.03s 
+     http_req_connecting............: avg=513.25ms min=0s       med=949.58µs max=3.05s    p(90)=3.02s    p(95)=3.03s 
+     http_req_duration..............: avg=29.51s   min=452.04ms med=31.15s   max=50.44s   p(90)=37.05s   p(95)=41.74s
+       { expected_response:true }...: avg=9.24s    min=452.04ms med=7.96s    max=32.5s    p(90)=19.42s   p(95)=27.41s
+     http_req_failed................: 96.73% ✓ 12074     ✗ 407   
+     http_req_receiving.............: avg=4.57µs   min=0s       med=0s       max=8.86ms   p(90)=0s       p(95)=0s    
+     http_req_sending...............: avg=718.89µs min=11.89µs  med=66.83µs  max=101.88ms p(90)=510.25µs p(95)=1.15ms
+     http_req_tls_handshaking.......: avg=0s       min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s    
+     http_req_waiting...............: avg=29.51s   min=451.86ms med=31.15s   max=50.44s   p(90)=37.05s   p(95)=41.74s
+     http_reqs......................: 12481  98.263787/s
+     iteration_duration.............: avg=31.22s   min=1.46s    med=33.61s   max=51.91s   p(90)=38.37s   p(95)=43.05s
+     iterations.....................: 12481  98.263787/s
+     vus............................: 982    min=41      max=4995
+     vus_max........................: 5000   min=5000    max=5000
+
+
+running (2m07.0s), 0000/5000 VUs, 12481 complete and 0 interrupted iterations
+default ✓ [======================================] 0000/5000 VUs  1m45s
+```
+
+Resultado de Grafana:
+
+![CPU usage](img/test2-cpu.png)
+![Network traffic](img/test2-network.png)
+![Memory usage](img/test2-memory.png)
+![Disk usage](img/test2-disk-usage.png)
+
+### Test 3: Register new users
+
+Archivo de configuración de K6 utilizado:
+
+```js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+// Función para generar una cadena aleatoria de longitud dada
+function generateRandomString(length) {
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    result += charset.charAt(randomIndex);
+  }
+  return result;
+}
+
+export const options = {
+  stages: [
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
+  ],
+};
+
+export default function () {
+  // Generar datos aleatorios para cada usuario
+  const email = `user${Math.floor(Math.random() * 100000)}@example.com`;
+  const password = generateRandomString(8);
+
+  // Crear el objeto de usuario
+  const user = {
+    email,
+    password,
+  };
+
+  // Realizar la solicitud POST para registrar un nuevo usuario
+  const res = http.post('http://192.168.39.203:31000/auth/register', JSON.stringify({ user }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  // Verificar si la respuesta es exitosa (código 2xx)
+  check(res, {
+    'status was 2xx': (r) => r.status >= 200 && r.status < 300,
+  });
+
+  // Introducir una pausa de 1 segundo entre las solicitudes
+  sleep(1);
+}
+
+```
+
+Resultado de consola de k6:
+
+```sh
+ ✗ status was 2xx
+      ↳  2% — ✓ 345 / ✗ 11276
+
+     checks.........................: 2.96%  ✓ 345       ✗ 11276 
+     data_received..................: 122 kB 952 B/s
+     data_sent......................: 2.8 MB 22 kB/s
+     http_req_blocked...............: avg=241.39ms min=2.51µs   med=610.72µs max=7.14s    p(90)=1.03s    p(95)=1.05s 
+     http_req_connecting............: avg=241.29ms min=0s       med=532.82µs max=7.14s    p(90)=1.03s    p(95)=1.05s 
+     http_req_duration..............: avg=31.44s   min=372.26ms med=31.69s   max=58.3s    p(90)=41.86s   p(95)=46.66s
+       { expected_response:true }...: avg=8.98s    min=372.26ms med=6.89s    max=37.73s   p(90)=20.51s   p(95)=25.54s
+     http_req_failed................: 97.03% ✓ 11276     ✗ 345   
+     http_req_receiving.............: avg=2.46µs   min=0s       med=0s       max=532.61µs p(90)=0s       p(95)=0s    
+     http_req_sending...............: avg=229.78µs min=10.67µs  med=59.28µs  max=11.64ms  p(90)=408.53µs p(95)=1.26ms
+     http_req_tls_handshaking.......: avg=0s       min=0s       med=0s       max=0s       p(90)=0s       p(95)=0s    
+     http_req_waiting...............: avg=31.44s   min=372.09ms med=31.69s   max=58.3s    p(90)=41.86s   p(95)=46.66s
+     http_reqs......................: 11621  91.116311/s
+     iteration_duration.............: avg=32.78s   min=1.37s    med=32.84s   max=59.53s   p(90)=43.03s   p(95)=47.82s
+     iterations.....................: 11621  91.116311/s
+     vus............................: 766    min=41      max=4994
+     vus_max........................: 5000   min=5000    max=5000
+
+
+running (2m07.5s), 0000/5000 VUs, 11621 complete and 0 interrupted iterations
+default ✓ [======================================] 0000/5000 VUs  1m45s
+```
+
+Resultado de Grafana:
+
+![CPU usage](img/test3-cpu.png)
+![Network traffic](img/test3-network.png)
+![Memory usage](img/test3-memory.png)
+![Disk usage](img/test3-disk-usage.png)
+
+### Test 4: Register new products
+
+Archivo de configuración de K6 utilizado:
+
+```js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
+  ],
+};
+
+// Tokens para dos usuarios distintos
+const token1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhZ3VzdGlubkBnbWFpbC5jb20iLCJleHAiOjE3MDI5MjgzOTd9.VveUVEFxY8E1fT20h-yUxEj46rAzZugdpTW1XpuksYU';  // aagustinn@gmail.com
+const token2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhZ3VzdGlubkBnbWFpbC5jb20iLCJleHAiOjE3MDI5MjgzOTd9.VveUVEFxY8E1fT20h-yUxEj46rAzZugdpTW1XpuksYU';  // aagustinn@gmail.com
+
+export default function () {
+  // Alternancia entre usuarios
+  const userToken = __VU % 2 === 0 ? token1 : token2;
+
+  // Datos aleatorios para la creación de productos
+  const productCodeLength = Math.floor(Math.random() * 6) + 8; // Entre 8 y 13 caracteres
+  const productCode = Math.random().toString(36).substring(2, productCodeLength + 2);
+  const productName = `product_${productCode}`;
+  const price = Math.floor(Math.random() * 1000);
+  const amount = Math.floor(Math.random() * 100);
+
+  // Realizar la solicitud POST para la creación de productos
+  const res = http.post('http://192.168.39.203:31000/product/add', `{
+    "new_product": {
+      "product_code": "${productCode}",
+      "name": "${productName}",
+      "price": ${price},
+      "amount": ${amount}
+    }
+  }`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${userToken}`,
+    },
+  });
+
+  // Verificar si la respuesta es exitosa (código 2xx)
+  check(res, {
+    'status was 2xx': (r) => r.status >= 200 && r.status < 300,
+  });
+
+  // Introducir una pausa de 1 segundo entre las solicitudes
+  sleep(1);
+}
+
+```
+
+Resultado de consola de k6:
+
+```sh
+     ✗ status was 2xx
+      ↳  10% — ✓ 1316 / ✗ 10795
+
+     checks.........................: 10.86% ✓ 1316      ✗ 10795 
+     data_received..................: 323 kB 2.4 kB/s
+     data_sent......................: 5.6 MB 42 kB/s
+     http_req_blocked...............: avg=203.4ms  min=2.42µs med=755.2µs  max=1.03s  p(90)=1.02s    p(95)=1.02s  
+     http_req_connecting............: avg=203.31ms min=0s     med=638.59µs max=1.03s  p(90)=1.02s    p(95)=1.02s  
+     http_req_duration..............: avg=30.57s   min=8.11ms med=30.84s   max=55.6s  p(90)=47.06s   p(95)=50.89s 
+       { expected_response:true }...: avg=1.54s    min=8.11ms med=287.59ms max=27.99s p(90)=1.17s    p(95)=3.11s  
+     http_req_failed................: 89.13% ✓ 10795     ✗ 1316  
+     http_req_receiving.............: avg=11.27µs  min=0s     med=0s       max=5.32ms p(90)=49.44µs  p(95)=74.14µs
+     http_req_sending...............: avg=105.04µs min=10.8µs med=57.93µs  max=4.71ms p(90)=206.62µs p(95)=298.7µs
+     http_req_tls_handshaking.......: avg=0s       min=0s     med=0s       max=0s     p(90)=0s       p(95)=0s     
+     http_req_waiting...............: avg=30.57s   min=8.02ms med=30.84s   max=55.6s  p(90)=47.06s   p(95)=50.89s 
+     http_reqs......................: 12111  89.698041/s
+     iteration_duration.............: avg=31.93s   min=1s     med=32.03s   max=57.1s  p(90)=48.34s   p(95)=52.15s 
+     iterations.....................: 12111  89.698041/s
+     vus............................: 94     min=34      max=4999
+     vus_max........................: 5000   min=5000    max=5000
+
+
+running (2m15.0s), 0000/5000 VUs, 12111 complete and 94 interrupted iterations
+default ✓ [======================================] 0060/5000 VUs  1m45s
+```
+
+Resultado de Grafana:
+
+![CPU usage](img/test4-cpu.png)
+![Network traffic](img/test4-network.png)
+![Memory usage](img/test4-memory.png)
+![Disk usage](img/test4-disk-usage.png)
+
+### Test 5: Get images
+
+Archivo de configuración de K6 utilizado:
+
+```js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
+  ],
+};
+
+export default function () {
+  // Proporcionar una lista de IDs de las imágenes
+  const imageIds = [
+    '57d2adf1-8062-4908-a73f-02f4c9320d35',
+    '23598a4e-2d32-4b3a-b55e-00773c8cbe46',
+  ];
+
+  // Realizar solicitudes GET para obtener imágenes
+  imageIds.forEach((imageId) => {
+    const res = http.get(`http://192.168.39.203:31000/image/get/?id=${imageId}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    // Verificar si la respuesta es exitosa (código 2xx)
     check(res, {
-      "status was 200": (r) => r.status == 200,
-      "duration was <=": (r) => r.timings.duration <= 200
-    });
-    sleep(1)
-  }
-}
-```
-
-Notaremos que definimos diferentes stages o "etapas" de la prueba, donde, por ejemplo, en la primera tendremos una duración de 30 segundos y la cantidad de usuarios de la prueba será de 25.
-
-Luego definimos páginas objetivo para cada prueba, entonces no solo hacemos el test de carga sobre la página home, por ejemplo, sino también sobre las diferentes subpáginas.
-
-Se añadió un checkeo para ver si la respuesta es del tipo 200 y dura menos de 200ms para poder observar cuantas fueron OK y cuantas no de todas las request que se enviaron. Incluimos también una subpágina inexistente para ver cómo maneja los errores.
-
-Nuevamente, para simular:
-
-```sh
-k6 run stages.js
-```
-
-Y lo que obtenemos de output es lo siguiente:
-
-```sh
-
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
-  / __________ \  |__| \__\ \_____/ .io
-
-  execution: local
-     script: stages.js
-     output: -
-
-  scenarios: (100.00%) 1 scenario, 50 max VUs, 2m20s max duration (incl. graceful stop):
-           * default: Up to 50 looping VUs for 1m50s over 3 stages (gracefulRampDown: 30s, gracefulStop: 30s)
-
-
-     ✗ status was 200
-      ↳  66% — ✓ 2028 / ✗ 1014
-     ✗ duration was <=
-      ↳  99% — ✓ 3029 / ✗ 13
-
-     checks.........................: 83.11% ✓ 5057      ✗ 1027
-     data_received..................: 61 MB  547 kB/s
-     data_sent......................: 339 kB 3.0 kB/s
-     http_req_blocked...............: avg=612.42µs min=180ns   med=1.1µs    max=174.74ms p(90)=1.82µs  p(95)=1.98µs  
-     http_req_connecting............: avg=272.83µs min=0s      med=0s       max=68.29ms  p(90)=0s      p(95)=0s      
-     http_req_duration..............: avg=33.68ms  min=18.67ms med=25.53ms  max=934.71ms p(90)=57.33ms p(95)=80.49ms 
-       { expected_response:true }...: avg=32.19ms  min=18.67ms med=24.94ms  max=695.95ms p(90)=50.75ms p(95)=77.5ms  
-     http_req_failed................: 25.00% ✓ 1014      ✗ 3042
-     http_req_receiving.............: avg=9.38ms   min=32.15µs med=3.47ms   max=341.74ms p(90)=22.14ms p(95)=51.83ms 
-     http_req_sending...............: avg=127.28µs min=25.12µs med=128.26µs max=965.15µs p(90)=181.2µs p(95)=205.91µs
-     http_req_tls_handshaking.......: avg=334.8µs  min=0s      med=0s       max=106.08ms p(90)=0s      p(95)=0s      
-     http_req_waiting...............: avg=24.17ms  min=18.5ms  med=21.37ms  max=926.46ms p(90)=26.99ms p(95)=30.78ms 
-     http_reqs......................: 4056   36.330472/s
-     iteration_duration.............: avg=3.14s    min=3.08s   med=3.1s     max=5.28s    p(90)=3.23s   p(95)=3.3s    
-     iterations.....................: 1014   9.082618/s
-     vus............................: 2      min=1       max=50
-     vus_max........................: 50     min=50      max=50
-
-
-running (1m51.6s), 00/50 VUs, 1014 complete and 0 interrupted iterations
-default ✓ [======================================] 00/50 VUs  1m50s
-```
-
-Vemos que al incluir una página inexistente hubo 1014 request que no tuvieron respuesta del tipo 200 (OK). Además hubo 13 request que duraron más de 200ms.
-
-Ahora, respecto a cómo manejó el error de una página existente, si observamos el exit code de la ejecución anterior:
-
-```sh
-> echo $?                                                                                                     
-0
-```
-
-Nos dá `0`, lo que implica que NO HUBO ERRORES DE EJECUCIÓN, lo pudo manejar. Entonces, si estamos trabajando en algún pipeline, no hay necesidad de parar ya que NO existe error.
-
-## Incluir K6 en CI/CD Pipelines
-
-```js
-import http from "k6/http";
-import { check, sleep } from 'k6';
-
-
-export const options = {
-  stages: [
-    { duration: "30s", target: 10 },
-    { duration: "1m", target: 50 },
-    { duration: "20s", target: 0 },
-  ],
-
-  thresholds: {
-    http_req_duration: ["p(90)<200", "p(95)<300"],
-    /*
-    "http_req_duration{what:home}": [{
-      thresholds: "p(95)<100",
-      abortOnFail: true,
-      delayAbortEval: "10s",
-    }],
-    */
-  }
-};
-
-export default function () {
-  const pages = [
-    "/2-body",
-    "/5-attachments",
-    "/this-does-not-exist/",
-  ]
-
-  for (const page of pages) {
-    const resHome = http.get(
-      "https://aagustinconti.github.io/testing_apps_tcpip",
-      {
-        tags: { what: "home" }
-      });
-
-    check(resHome, {
-      "status was 200": (r) => r.status == 200,
+      'status was 2xx': (r) => r.status >= 200 && r.status < 300,
     });
 
-    const resPage = http.get("https://aagustinconti.github.io/testing_apps_tcpip" + page);
-
-    check(resPage, {
-      "status was 200": (r) => r.status == 200,
-    });
-
+    // Introducir una pausa de 1 segundo entre las solicitudes
     sleep(1);
-  }
+  });
 }
+
 ```
 
-Aquí incluimos, además de diferentes etapas, diferentes "requerimientos", donde definimos múltiples "umbrales" o "thresholds", para las diferentes páginas, siendo más o menos demandantes para cada una. Además le definimos que en el caso de que no se cumpla alguna de los requerimientos que pare el proceso.
-
-Para ejecutar esto:
+Resultado de consola de k6:
 
 ```sh
-k6 run ci.js
+     ✗ status was 2xx
+      ↳  0% — ✓ 46 / ✗ 12242
+
+     checks.........................: 0.37%  ✓ 46        ✗ 12242 
+     data_received..................: 2.2 MB 16 kB/s
+     data_sent......................: 2.2 MB 17 kB/s
+     http_req_blocked...............: avg=781.12ms min=4.71µs  med=1.15ms   max=7.24s    p(90)=3.03s    p(95)=3.06s   
+     http_req_connecting............: avg=780.93ms min=0s      med=991.98µs max=7.24s    p(90)=3.03s    p(95)=3.06s   
+     http_req_duration..............: avg=30.27s   min=73.76ms med=30.33s   max=1m0s     p(90)=48.87s   p(95)=54.06s  
+       { expected_response:true }...: avg=419.68ms min=73.76ms med=414.18ms max=800.17ms p(90)=684.03ms p(95)=763.76ms
+     http_req_failed................: 99.62% ✓ 12242     ✗ 46    
+     http_req_receiving.............: avg=254.2ms  min=0s      med=0s       max=30.77s   p(90)=0s       p(95)=0s      
+     http_req_sending...............: avg=74.72ms  min=11.36µs med=97.25µs  max=26.8s    p(90)=704.63µs p(95)=1.56ms  
+     http_req_tls_handshaking.......: avg=0s       min=0s      med=0s       max=0s       p(90)=0s       p(95)=0s      
+     http_req_waiting...............: avg=29.95s   min=6.22ms  med=30.33s   max=1m0s     p(90)=48.55s   p(95)=53.75s  
+     http_reqs......................: 12288  90.987543/s
+     iteration_duration.............: avg=1m4s     min=26.73s  med=1m7s     max=1m35s    p(90)=1m28s    p(95)=1m30s   
+     iterations.....................: 5423   40.155065/s
+     vus............................: 1442   min=42      max=4999
+     vus_max........................: 5000   min=5000    max=5000
+
+
+running (2m15.1s), 0000/5000 VUs, 5423 complete and 1442 interrupted iterations
+default ✓ [======================================] 1432/5000 VUs  1m45s
 ```
+
+Resultado de Grafana:
+
+![CPU usage](img/test5-cpu.png)
+![Network traffic](img/test5-network.png)
+![Memory usage](img/test5-memory.png)
+![Disk usage](img/test5-disk-usage.png)
+
+## Conclusiones de las pruebas realizadas
+
+En términos generales, hemos logrado cumplir con los requisitos establecidos por la empresa, confirmando que la plataforma es capaz de soportar hasta 5000 usuarios en su página de inicio, aunque esta evaluación consideró un número limitado de productos al inicio de la prueba. No obstante, las pruebas adicionales revelaron limitaciones notables, principalmente relacionadas con la capacidad del disco tanto en términos de la cantidad de productos y usuarios que podemos agregar como en su rendimiento de lectura/escritura, siendo este un factor determinante en las operaciones que involucran la base de datos.
+
+En todas las instancias en las que la base de datos estuvo involucrada, como la creación de nuevos productos y usuarios, el rendimiento del disco se destacó como el factor crítico. Observamos que las pruebas centradas en usuarios afectaron más al CPU, especialmente cuando la API tuvo que encriptar o desencriptar contraseñas. A lo largo de todas las pruebas, la memoria mostró una estabilidad notable, mientras que la red experimentó una mayor actividad durante las transmisiones y recepciones de información en las solicitudes a la API.
+
+Como conclusión, consideramos que el sistema es fiable para el uso actual de la empresa. Sin embargo, en caso de requerir una mayor creación de usuarios o un mayor número de solicitudes, se sugiere la implementación de un Ingress Controller y un balanceador de carga, junto con el escalado de los Deployments de la UI, la API y la DB. En particular, para la base de datos, se recomienda configurarla como un ReplicaSet para optimizar su rendimiento.
 
 ## Referencias
 

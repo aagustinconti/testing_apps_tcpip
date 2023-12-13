@@ -3,16 +3,16 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },
-    { duration: '2m', target: 100 },
-    { duration: '1m', target: 0 },
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
   ],
 };
 
 export default function () {
   // Datos del usuario para el login
-  const username = 'aagustin@gmail.com';
-  const password = '12345678';
+  const username = 'user1@example.com';
+  const password = 'soyuser1';
 
   // Realizar la solicitud POST para el login del usuario
   const res = http.post('http://192.168.39.203:31000/auth/login', {

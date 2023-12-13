@@ -3,17 +3,17 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },
-    //{ duration: '2m', target: 100 },
-    //{ duration: '1m', target: 1000 },
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
   ],
 };
 
 export default function () {
   // Proporcionar una lista de IDs de las imágenes
   const imageIds = [
-    '57d2adf1-8062-4908-a73f-02f4c9320d35',
-    '23598a4e-2d32-4b3a-b55e-00773c8cbe46',
+    "0bce1d8a-fd10-42ee-be89-22da799116f2",
+    "ca26241a-fda5-46fe-a117-3f66072b3fb8",
   ];
 
   // Realizar solicitudes GET para obtener imágenes

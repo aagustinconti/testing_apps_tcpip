@@ -14,9 +14,9 @@ function generateRandomString(length) {
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },
-    { duration: '2m', target: 100 },
-    { duration: '1m', target: 0 },
+    { duration: '15s', target: 1000 },
+    { duration: '30s', target: 2500 },
+    { duration: '1m', target: 5000 },
   ],
 };
 
