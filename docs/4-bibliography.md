@@ -1,8 +1,11 @@
+---
+title: Bibliografía
+---
 # Bibliografía
 
 - [Documentacion de SQLAlchemy](https://docs.sqlalchemy.org/en/20/)
 
-- [What is Next.js?](https://nextjs.org/docs) 
+- [What is Next.js?](https://nextjs.org/docs)
 
 - [Mantine UI](https://mantine.dev/)
 
