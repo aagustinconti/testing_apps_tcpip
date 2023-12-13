@@ -1,18 +1,48 @@
-# API Docs
+# API & UI
 
-## How to run
+## Contexto
 
-Para correr la aplicacion hace falta poseer docker instalado en el equipo, ademas se debe crear una copia de `.env.sample` y renombrarla como `.env` para que docker sea capaz de cargar las configuraciones.
+En esta parte del desarrollo nos dedicamos a desarrollar una API CRUD con FAST API usando python. El objetivo principal de esta API es un sistema de control de stock para negocios, con capacidad de crear y contener usuarios. También, el agregado de los productos en stock, con sus características, entre ellas, nombre, código, precio, cantidad, descripción e imagen ilustrativa, la cual es subida a través de la API.
 
-Una vez realizado esto, para correr el proyeco, se debe usar:
+Además en esta instancia se tomó la decisión de la base de datos a usar, considerando el entorno de producción, al ser Kubernetes terminamos optando por MySQL, por facilidad de desplegar y para interactuar con la base de datos se utilizó el ORM SQLAlchemy.
+
+Por último, desarrolló una interfaz de usuario (UI) basada en NODE JS, haciendo uso del framework Next JS, el cual permite el uso de componentes de React para generar aplicaciones multi página. A través de esta interfaz gráfica, el usuario será capaz de:
+
+* Observar todos los productos registrados en la base de datos y filtrar por código o nombre de producto a través de una barra de búsqueda.
+* En caso de estar registrado como operador del sistema, se podrá acceder a un panel de administración.
+* A través del panel de administración, será posible agregar, editar o borrar productos. Al momento de editar o agregar un producto se podrá subir una imágen ilustrativa del mismo.
+* No se posee una interfaz de registro, estos se deberan hacer via API con ayuda de algun desarollador. 
+
+Para la etapa de desarrollo local, se utilizó Docker como herramienta de contenerización, que permite luego subir imágenes al Docker Hub. A través de la herramienta Docker Compose, la cual permitió simular un ambiente parecido al de producción.  
+
+## Como generar el ambiente de desarrollo local
+
+Como primer paso, se debe tener instalado poetry y nodejs.
+
+Primero, se deben instalar las dependencias de python con poetry.
+
+```bash
+poetry install
+```
+
+Luego se debe igresar a la carpeta de la ui e instalar las dependencias de nodejs
+
+```bash
+cd ./ui
+npm install
+```
+
+Para ejecutar la aplicacion hace falta poseer docker instalado en el equipo, ademas se debe crear una copia de `.env.sample` y renombrarla como `.env` para que docker sea capaz de cargar las configuraciones.
+
+Una vez realizado esto, para ejecutar el proyeco, se debe usar:
 
 ```bash
 docker compose up -d --build
  ```
 
-Esto levantara la base de datos, la api y el gestor web de mongo (Este ultimo se debe retirar en entornos de produccion o retirarle el acceso a la web)
+Esto levantara la base de datos (MySQL), la API y la (UI).
  
-El tag `--build` fuerza a que con cada inicio del deploy se re cree la imagen de la api. No seria necesario en un simple reinicio.
+El tag `--build` fuerza a que al inicio del despliegue se re cree la imagen de la API y UI. No seria necesario en un simple reinicio.
 
 Para parar la infraestructura se debe usar:
 
@@ -24,9 +54,13 @@ En caso de querer correr en modo desarollo, se debe iniciar el deploy y luego ut
 
 ```bash
 docker compose down api
+# 0
+docker compose down ui
 ```
 
-El cual dara de baja el contenedor de la api y la api debera ser iniciada con el comando:
+El comando a seleccionar dependera de en que entorno se deba trabajar, dado que el primero da de baja el contenedor de API y el segundo el de la UI.
+
+Para correr la API en modo desarollo se puede hacer uso de los sugientes comandos:
 
 ```bash
 # Usando poetry
@@ -36,66 +70,80 @@ poetry run uvicorn app.main:app --reload
 uvicorn app.main:app --reload
 ```
 
-### Buildear imagen
-
-Para buildear la imagen se debe hacer uso del siguiente comando:
+Y en el caso de la UI dentro de la carpeta ui:
 
 ```bash
-docker build -f ./app/Dockerfile .
+npm run dev
 ```
 
 ## Estructura
 
-Para mejor organizacion del proyecto, este se organizara internamente por carpetas:
+El proyecto, este se organiza internamente por carpetas:
 
-* `api`: contendra toda la logica corespondiente a las rutas de las API's y que deben hacer estas. 
-* `core`: contendra utilidades generales al protecto, como configuraciones globales y utilidades de todo tipo.
-* `crud`: Contendra las funciones CRUD (Create, Read, Update, Delete).
+La carpeta `app` contiene todo lo referente a la API, y se compone de las subcarpetas:
+
+* `api`: Contiene toda la logica corespondiente a las rutas de la API (Definicion de endpoints). 
+* `core`: Contiene utilidades generales al protecto de la API, como configuraciones globales.
+* `crud`: Contiene las funciones CRUD (Create, Read, Update, Delete) las cuales interactuan con la base de datos.
 * `db`: Contiene utilidades referidas a la conexion con la base de datos.
-* `models`: Contiene las clases de datos, ya sean las guardades dentro de la base de datos como las clases que se utilizan en las respuestas o peticiones a la API.
+* `models`: Contiene las clases constructoras de objetos utilizadas en el proyecto. Se diferencian dos tipos de clases, la primera clases de SQLAlchemy y clases de Pydantic. Las primeras son las encargadas de generar las tablas en la base de datos y gestionar la recuperacion e insercion de datos y las segundas son utilizadas como respuestas de los endpoints.
 
-## API_V1
+La carpeta `ui` contiene todo lo referente a la UI, esta se compone de las subcarpetas:
 
-Dentro de esta carpeta se colocaran todos los enpoints correspondientes al desarollo. 
+* `components`: Contiene componentes de react utilizados en las diferentes paginas o en diferentes componentes.
+* `pages`: Contiene la estructura de paginas y ruteo del servidor web. Es decir, el `index.ts` representa al `index.html` de `/`, mientras que el `/admin/index.ts` representa el `/admin/index.html`.
+    * Dentro de pages a su ves notamos una carpeta `api`, la cual funciona de intermediario entre la API de Fast Api y el servidor web de nextjs. Mediante esta, podemos evitar exponer directamente la API a los clientes.
+* `public`: Contiene los recursos publicos de la pagina web.
+* `utils`: Contiene definicion de interfaces (Parecidas a las clases pero solo denotan una estructura de datos) y configuraciones como la ruta de la API.
 
-Actualmente, el unico endpoint creado y no completo es auth.
+### Aclaracion sobre NextJS
 
-### Auth endpoints
+Next.js es un framework basado en React que facilita la renderización del código en el servidor, entregando al cliente un conjunto de archivos HTML, CSS y JavaScript con la lógica de acciones correspondiente. Cada página React, definida como exportación por defecto, debe ser pre-renderizada y enviada al cliente. Además, el uso de `getServerSideProps` permite ejecutar código antes de la renderización, posibilitando la limitación de acceso a páginas basándose en la presencia de cookies. Por otro lado, las rutas de API ubicadas en `ui/pages/api` son procesadas en el servidor.
 
-- `/api/users/login`: Endpoint **post** donde se envia email y contraseña para iniciar sesion.
-- `/api/users/add`: Endpoint **post** donde se envian los datos de un nuevo usuario para registrarlo en la base de datos, se requiere *email*, *username*, *password*.
+## Ejemplos y pruebas
 
-## Core
+Previo a la integracion con la UI, una vez todos los endpoints estaban desarollados, se procedio a probar cada uno de estos endpoints. Para esto se utilizo el Swagger que viene incorporado en Fast API que se encuentra en `http://localhost:8000/docs`:
 
-Dentro de esta carpeta se encuentran utilidades generales:
+Para todos los endpoints, a la hora probarlos, deberemos seguir estos dos pazos, desplegar dicho endpoint y seleccionar el boton `Try it out`.
 
-* `config`: Manejo de variables de entorno y variables constantes para todo el proyecto.
-* `errors`: Funciones callback para el manejo de errores de FastAPI.
-* `jwt`: Manejo de Json Web Token. Creacion, verificacion, etc.
-* `security`: Manejo del algoritmo de hash de las contraseñas, por motivos de seguridad, la contraseñas se guardan en bcrypt, el cual es un algorimo de hasheado muy dificil de romper, la contraseña viajara en texto plano hasta la api para ser verificada contra la version hasheada y guardada en la base de datos.
+![Desplegar el endpoint](temp_docs_img/usuario_desplegar.png)
+![Iniciar prueba del endpoint](temp_docs_img/usuario_probar.png)
 
-## Crud
+En caso de querer crear un usuario:
 
-Esta carpeta contiene las funciones correspondientes a las operaciones CRUD de cada uno de los modelos de datos que manejara la api, cada uno de estos debe corresponder a uno o varios endpoints.
+![Enviar datos](temp_docs_img/usuario_insertar.png)
+![Revisar el resultado](temp_docs_img/usuario_resultado.png)
 
-* `user`: Contiene las funciones de creado, borrado, lectura y actualizacion de usuarios en la base de datos.
+Para iniciar sesion con dicho usuario y mantener las credenciales guardadas para el resto de endpoints
 
-## db
+![Abir formulario de login](temp_docs_img/login_abrir.png)
+![Login](temp_docs_img/logear.png)
 
-Esta carpeta contiene la logica de conexión con la base de datos.
+Para crear un producto:
 
-* `mongodb`: Contiene la clase que almacena la conexion con la base de datos.
-* `mongodb_utils`: Contiene las funciones de conexion y desconexion. Ojo con el string de conexion que se usa dentro de este archivo en la funcion `connect_to_mongo` en mi caso tuve problemas al tratarse del usuario administrador de mongo, lo cual no es una buena practica, para eso debi agregar al final del string que se encuentra en `core/config/MONGODB_URL` lo siguiente: `?authSource=admin`. para poder establecer la conexion correctamente con la base de datos.
+![Crear producto](temp_docs_img/producto_crear.png)
 
-## Models
+Para obtener todos los productos debemos usar solo el boton `Try it out` sobre el endpoint `/products/get/all`.
 
-Esta carpeta contiene las clases de datos a utilizar por los endpoints y las funciones CRUD. Puede contener las clases de los objetos que se guardan en base de datos, como las clases que son utilizadas en las respuestas de los endpoints o como entrada de estos.
+Una vez comprobada la funcionalidad de dichos endpoints, se procedio a desarollar y probar la UI:
 
-* `dbmodel`: Contiene las clases padre de las cuales las diferentes clases que requieran uso de la base de datos tienen que heredar.
-* `rwmodel`: Contiene la clase padre cruda, de la cual tienen que heredar las clases que son utilizadas como respuesta o entrada de los endpoints.
-* `token`: Contiene la clase cruda de jwt.
-* `user`: Contiene todas las clases referidas al usuario, desde la que se guarda en base de datos hasta las diferentes clases utilizadas por los enpoints.
+![Pagina principal](temp_docs_img/ui_principal.png)
 
-## main.py
+Si seleccionamos administrar, al no estar logeados, nos redireccionara a la pagina de login:
 
-Se trata del core de la aplicacion, donde se inicializa el logging de informacion y errores, ademas de los midelware de la aplicacion y el router de la API.
+![Login](temp_docs_img/ui_login.png)
+
+Una vez logeados podemos ir a la pagina admin donde veremos nuestros productos, editarlos y borrarlos, ademas de agregarlos.
+
+![Panel admin](temp_docs_img/ui_admin.png)
+
+Para agregar un producto:
+
+![Boton de agregar](temp_docs_img/ui_agregar_1.png)
+![Interfaz de agregar](temp_docs_img/ui_agregar_2.png)
+
+Para editar, la interfaz es la misma, solo que se accede del boton de editar.
+
+Por ultimo para borrar, precionamos el icono de la papelera y nos saldra una confirmacion:
+
+![](temp_docs_img/ui_borrar.png)
