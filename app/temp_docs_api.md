@@ -12,6 +12,7 @@ Por último, desarrolló una interfaz de usuario (UI) basada en NODE JS, haciend
 * En caso de estar registrado como operador del sistema, se podrá acceder a un panel de administración.
 * A través del panel de administración, será posible agregar, editar o borrar productos. Al momento de editar o agregar un producto se podrá subir una imágen ilustrativa del mismo.
 * No se posee una interfaz de registro, estos se deberan hacer via API con ayuda de algun desarollador. 
+* Cabe destacar que cada usuario tendra productos asociados a el, no podra ver ni operar sobre productos de otros usuarios en el panel de administracion.
 
 Para la etapa de desarrollo local, se utilizó Docker como herramienta de contenerización, que permite luego subir imágenes al Docker Hub. A través de la herramienta Docker Compose, la cual permitió simular un ambiente parecido al de producción.  
 
